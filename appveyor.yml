@@ -1,0 +1,43 @@
+image: Visual Studio 2017
+platform: Any CPU
+
+environment:
+  version: $(APPVEYOR_BUILD_VERSION)
+
+configuration:
+- Release
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '%version%'
+  package_version: '%version%'
+  assembly_version: '%version%'
+  file_version: '%version%'
+  informational_version: '%version%'
+
+before_build:
+  - choco install opencover.portable
+  - choco install codecov
+  - dotnet restore
+
+build:
+  project: Newtonsoft.Extensions.JsonMasking.sln
+
+test_script:
+  - OpenCover.Console.exe -oldstyle -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full Newtonsoft.Extensions.JsonMasking.Tests\Newtonsoft.Extensions.JsonMasking.Tests.csproj" -filter:"+[Newtonsoft.Extensions.JsonMasking*]* -[Newtonsoft.Extensions.JsonMasking.Tests*]*" -output:".\coverage.xml"
+  - codecov -f .\coverage.xml -t %CODECOV_TOKEN%
+
+after_test:
+  - dotnet pack --configuration Release /p:Version=%version%
+
+artifacts:
+  - path: Newtonsoft.Extensions.JsonMasking\bin\Release\netstandard2.0\Newtonsoft.Extensions.JsonMasking.dll
+    name: Newtonsoft.Extensions.JsonMasking.dll
+  - path: Newtonsoft.Extensions.JsonMasking\bin\Release\Newtonsoft.Extensions.JsonMasking.%version%.nupkg
+    name: Newtonsoft.Extensions.JsonMasking.%version%.nupkg
+
+deploy:
+  provider: NuGet
+  api_key:
+    secure: hb5jOmzsvUKCtOP41EFtc/lwXAOh5auC5KAi2Ok9i/FmTuo2F36yzEgaPiT9olsB

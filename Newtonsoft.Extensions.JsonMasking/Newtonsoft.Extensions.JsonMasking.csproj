@@ -2,6 +2,19 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Thiago Barradas</Authors>
+    <Company>Thiago Barradas</Company>
+    <Copyright>Ⓒ Thiago Barradas</Copyright>
+    <PackageLicenseUrl>https://github.com/ThiagoBarradas/newtonsoft-extensions-jsonmasking</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ThiagoBarradas/newtonsoft-extensions-jsonmasking</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ThiagoBarradas/newtonsoft-extensions-jsonmasking</RepositoryUrl>
+    <PackageTags>newtonsoft json masking utility remove mask core standard easy replace</PackageTags>
+    <PackageIconUrl>https://i.imgur.com/3f6ORTc.png</PackageIconUrl>
+    <Description>Replace fields in json, replacing by something, don't care if property is in depth objects. Very useful to replace passwords credit card number, etc.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="7.0.1" />
+  </ItemGroup>
 
 </Project>

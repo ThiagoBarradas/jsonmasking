@@ -5,6 +5,20 @@ VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Newtonsoft.Extensions.JsonMasking", "Newtonsoft.Extensions.JsonMasking\Newtonsoft.Extensions.JsonMasking.csproj", "{124D3B3E-3282-4A2D-89F1-8384CFBE4889}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{323DA697-4C17-4AFD-98D0-2C8135AF2001}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
+		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
+		LICENSE = LICENSE
+		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Newtonsoft.Extensions.JsonMasking.Tests", "Newtonsoft.Extensions.JsonMasking.Tests\Newtonsoft.Extensions.JsonMasking.Tests.csproj", "{0F9ABAF8-E1A8-47C3-90BD-53F0A967271C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +29,10 @@ Global
 		{124D3B3E-3282-4A2D-89F1-8384CFBE4889}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{124D3B3E-3282-4A2D-89F1-8384CFBE4889}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{124D3B3E-3282-4A2D-89F1-8384CFBE4889}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F9ABAF8-E1A8-47C3-90BD-53F0A967271C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F9ABAF8-E1A8-47C3-90BD-53F0A967271C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F9ABAF8-E1A8-47C3-90BD-53F0A967271C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F9ABAF8-E1A8-47C3-90BD-53F0A967271C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
