@@ -1,8 +1,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c1d0f1f96bdd4bf8b798367b9241b962)](https://www.codacy.com/app/ThiagoBarradas/newtonsoft-extensions-jsonmasking?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ThiagoBarradas/newtonsoft-extensions-jsonmasking&amp;utm_campaign=Badge_Grade)
 [![Build status](https://ci.appveyor.com/api/projects/status/tyep2lwnuk9k1oxx/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/newtonsoft-extensions-jsonmasking/branch/master)
 [![codecov](https://codecov.io/gh/ThiagoBarradas/newtonsoft-extensions-jsonmasking/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/newtonsoft-extensions-jsonmasking)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Mongo.CRUD.svg)](https://www.nuget.org/packages/Mongo.CRUD/)
-[![NuGet Version](https://img.shields.io/nuget/v/Mongo.CRUD.svg)](https://www.nuget.org/packages/Mongo.CRUD/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/Newtonsoft.Extensions.JsonMasking.svg)](https://www.nuget.org/packages/Newtonsoft.Extensions.JsonMasking/)
+[![NuGet Version](https://img.shields.io/nuget/v/Newtonsoft.Extensions.JsonMasking.svg)](https://www.nuget.org/packages/Newtonsoft.Extensions.JsonMasking/)
 
 # Json Masking Extension for Newntonsoft
 
