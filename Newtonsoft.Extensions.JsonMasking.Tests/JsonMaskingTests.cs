@@ -9,7 +9,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
     {
 
         [Fact]
-        public void MaskFields_Should_Mask_No_Field_With_Empty_Blacklist()
+        public static void MaskFields_Should_Mask_No_Field_With_Empty_Blacklist()
         {
             // arrange
             var obj = new
@@ -18,7 +18,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 Password = "somepass#here"
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { };
+            string[] blacklist = {};
             var mask = "*******";
 
             // act
@@ -29,7 +29,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Mask_No_Field_With_Json_Without_Property()
+        public static void MaskFields_Should_Mask_No_Field_With_Json_Without_Property()
         {
             // arrange
             var obj = new
@@ -38,7 +38,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 OtherField = "somepass#here"
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "*******";
 
             // act
@@ -49,7 +49,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Mask_Single_Field()
+        public static void MaskFields_Should_Mask_Single_Field()
         {
             // arrange
             var obj = new
@@ -58,7 +58,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 Password = "somepass#here"
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "----";
 
             // act
@@ -69,7 +69,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Mask_Integer_Field()
+        public static void MaskFields_Should_Mask_Integer_Field()
         {
             // arrange
             var obj = new
@@ -78,7 +78,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 Password = 123456
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "*******";
 
             // act
@@ -89,7 +89,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Mask_Depth_Field()
+        public static void MaskFields_Should_Mask_Depth_Field()
         {
             // arrange
             var obj = new
@@ -101,7 +101,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "*******";
 
             // act
@@ -112,7 +112,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Mask_Multiple_Fields()
+        public static void MaskFields_Should_Mask_Multiple_Fields()
         {
             // arrange
             var obj = new
@@ -125,7 +125,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "*******";
 
             // act
@@ -136,7 +136,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Mask_Multiple_Fields_With_Multiple_Blacklist()
+        public static void MaskFields_Should_Mask_Multiple_Fields_With_Multiple_Blacklist()
         {
             // arrange
             var obj = new
@@ -149,7 +149,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { "password", "creditcardnumber" };
+            string[] blacklist = { "password", "creditcardnumber" };
             var mask = "*******";
 
             // act
@@ -160,7 +160,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Mask_With_Null_Property()
+        public static void MaskFields_Should_Mask_With_Null_Property()
         {
             // arrange
             var obj = new
@@ -172,7 +172,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "*******";
 
             // act
@@ -183,7 +183,7 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Throw_Exception_When_Blacklist_Is_Null()
+        public static void MaskFields_Should_Throw_Exception_When_Blacklist_Is_Null()
         {
             // arrange
             var obj = new
@@ -204,11 +204,11 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Throw_Exception_When_Json_Is_Null()
+        public static void MaskFields_Should_Throw_Exception_When_Json_Is_Null()
         {
             // arrange
             string json = null;
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "*******";
 
             // act
@@ -220,11 +220,11 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Throw_Exception_When_Json_String_Is_Empty()
+        public static void MaskFields_Should_Throw_Exception_When_Json_String_Is_Empty()
         {
             // arrange
             string json = "";
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             var mask = "*******";
 
             // act
@@ -236,11 +236,11 @@ namespace Newtonsoft.Extensions.JsonMasking.Tests
         }
 
         [Fact]
-        public void MaskFields_Should_Throw_Exception_When_Json_String_Is_Invalid()
+        public static void MaskFields_Should_Throw_Exception_When_Json_String_Is_Invalid()
         {
             // arrange
             var json = "invalid json";
-            var blacklist = new string[] { "password" };
+            string[] blacklist = { "password" };
             string mask = "------";
 
             // act

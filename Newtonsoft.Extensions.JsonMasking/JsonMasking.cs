@@ -30,8 +30,6 @@ namespace Newtonsoft.Extensions.JsonMasking
                 throw new ArgumentNullException(nameof(blacklist));
             }
 
-            if (mask == null)
-
             if (blacklist.Any() == false)
             {
                 return json;
@@ -52,7 +50,10 @@ namespace Newtonsoft.Extensions.JsonMasking
         private static void MaskFieldsFromJToken(JToken token, string[] blacklist, string mask)
         {
             JContainer container = token as JContainer;
-            if (container == null) return;
+            if (container == null)
+            {
+                return;
+            }
 
             List<JToken> removeList = new List<JToken>();
             foreach (JToken el in container.Children())
