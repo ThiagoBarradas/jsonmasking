@@ -1,8 +1,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c1d0f1f96bdd4bf8b798367b9241b962)](https://www.codacy.com/app/ThiagoBarradas/newtonsoft-extensions-jsonmasking?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ThiagoBarradas/newtonsoft-extensions-jsonmasking&amp;utm_campaign=Badge_Grade)
 [![Build status](https://ci.appveyor.com/api/projects/status/tyep2lwnuk9k1oxx/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/newtonsoft-extensions-jsonmasking/branch/master)
 [![codecov](https://codecov.io/gh/ThiagoBarradas/newtonsoft-extensions-jsonmasking/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/newtonsoft-extensions-jsonmasking)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Newtonsoft.Extensions.JsonMasking.svg)](https://www.nuget.org/packages/Newtonsoft.Extensions.JsonMasking/)
-[![NuGet Version](https://img.shields.io/nuget/v/Newtonsoft.Extensions.JsonMasking.svg)](https://www.nuget.org/packages/Newtonsoft.Extensions.JsonMasking/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
+[![NuGet Version](https://img.shields.io/nuget/v/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
 
 # Json Masking Extension for Newntonsoft
 
@@ -48,7 +48,7 @@ Output
 ## Install via NuGet
 
 ```
-PM> Install-Package Newtonsoft.Extensions.JsonMasking
+PM> Install-Package JsonMasking
 ```
 
 ## How can I contribute?
@@ -58,7 +58,7 @@ Please, refer to [CONTRIBUTING](.github/CONTRIBUTING.md)
 Open a new Issue following our issue template [ISSUE_TEMPLATE](.github/ISSUE_TEMPLATE.md)
 
 ## Changelog
-See in [nuget version history](https://www.nuget.org/packages/Newtonsoft.Extensions.JsonMasking)
+See in [nuget version history](https://www.nuget.org/packages/JsonMasking)
 
 ## Did you like it? Please, make a donate :)
 

@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Newtonsoft.Extensions.JsonMasking\Newtonsoft.Extensions.JsonMasking.csproj" />
+    <ProjectReference Include="..\JsonMasking\JsonMasking.csproj" />
   </ItemGroup>
 
 </Project>

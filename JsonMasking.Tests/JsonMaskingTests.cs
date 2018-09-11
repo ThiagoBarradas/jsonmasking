@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
-using Newtonsoft.Extensions.JsonMasking;
+using JsonMasking;
 using System;
 using Xunit;
 
-namespace Newtonsoft.Extensions.JsonMasking.Tests
+namespace JsonMasking.Tests
 {
     public static class JsonMaskingTests
     {

@@ -22,20 +22,20 @@ before_build:
   - dotnet restore
 
 build:
-  project: Newtonsoft.Extensions.JsonMasking.sln
+  project: JsonMasking.sln
 
 test_script:
-  - OpenCover.Console.exe -oldstyle -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full Newtonsoft.Extensions.JsonMasking.Tests\Newtonsoft.Extensions.JsonMasking.Tests.csproj" -filter:"+[Newtonsoft.Extensions.JsonMasking*]* -[Newtonsoft.Extensions.JsonMasking.Tests*]*" -output:".\coverage.xml"
+  - OpenCover.Console.exe -oldstyle -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full JsonMasking.Tests\JsonMasking.Tests.csproj" -filter:"+[JsonMasking*]* -[JsonMasking.Tests*]*" -output:".\coverage.xml"
   - codecov -f .\coverage.xml -t %CODECOV_TOKEN%
 
 after_test:
   - dotnet pack --configuration Release /p:Version=%version%
 
 artifacts:
-  - path: Newtonsoft.Extensions.JsonMasking\bin\Release\netstandard2.0\Newtonsoft.Extensions.JsonMasking.dll
-    name: Newtonsoft.Extensions.JsonMasking.dll
-  - path: Newtonsoft.Extensions.JsonMasking\bin\Release\Newtonsoft.Extensions.JsonMasking.%version%.nupkg
-    name: Newtonsoft.Extensions.JsonMasking.%version%.nupkg
+  - path: JsonMasking\bin\Release\netstandard2.0\JsonMasking.dll
+    name: JsonMasking.dll
+  - path: JsonMasking\bin\Release\JsonMasking.%version%.nupkg
+    name: JsonMasking.%version%.nupkg
 
 deploy:
   provider: NuGet
