@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Newtonsoft.Extensions.JsonMasking.Tests
 {
-    public class JsonMaskingTests
+    public static class JsonMaskingTests
     {
 
         [Fact]
