@@ -26,7 +26,7 @@ var example = new
 			Number = "555500022223333"
 		}
 	},
-	CreditCardNumber = "5555000011112222,
+	CreditCardNumber = "5555000011112222",
 	Card = new 
 	{
 		Number = "555500022223333"
@@ -34,7 +34,9 @@ var example = new
 };
 
 var exampleAsString = JsonConvert.Serialize(example); // value must be a json string to masked
-var blacklist = new string[] { "password", "card.number", "*.card.number" "creditcardnumber" }; // insensitive
+
+// note that password is only replaced when is in root path
+var blacklist = new string[] { "password", "card.number", "*.card.number" "creditcardnumber" };
 var mask = "******";
 
 var maskedExampleAsString = exampleAsString.MaskFields(blacklist, mask);
@@ -49,12 +51,12 @@ Output
 	"SomeValue" : "Demo",
 	"Password" : "******",
 	"DepthObject" : {
-		"Password" : "SomePasswordHere2", // note that password is only replaced when is in root path
+		"Password" : "SomePasswordHere2",
 		"Card" : {
 			"Number" : "******"
 		}
 	},
-	"CreditCardNumber" : "******,
+	"CreditCardNumber" : "******",
 	"Card" : {
 		"Number" : "******"
 	}
