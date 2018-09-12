@@ -4,9 +4,9 @@
 [![NuGet Downloads](https://img.shields.io/nuget/dt/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
 [![NuGet Version](https://img.shields.io/nuget/v/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
 
-# Json Masking Extension for Newntonsoft
+# Json Masking 
 
-Replace fields in json, replacing by something, don't care if property is in depth objects. Very useful to replace passwords credit card number, etc.
+Replace fields in json, replacing by something, don't care if property is in depth objects. Very useful to replace passwords, credit card number, etc.
 
 This library matching insensitive values with field namespaces. You can use wildcard * to allow any char in pattern;
 
