@@ -1,6 +1,6 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c1d0f1f96bdd4bf8b798367b9241b962)](https://www.codacy.com/app/ThiagoBarradas/newtonsoft-extensions-jsonmasking?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ThiagoBarradas/newtonsoft-extensions-jsonmasking&amp;utm_campaign=Badge_Grade)
-[![Build status](https://ci.appveyor.com/api/projects/status/tyep2lwnuk9k1oxx/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/newtonsoft-extensions-jsonmasking/branch/master)
-[![codecov](https://codecov.io/gh/ThiagoBarradas/newtonsoft-extensions-jsonmasking/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/newtonsoft-extensions-jsonmasking)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a1c03f81731447218e44c17f2595e496)](https://www.codacy.com/app/ThiagoBarradas/jsonmasking?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ThiagoBarradas/jsonmasking&amp;utm_campaign=Badge_Grade)
+[![Build status](https://ci.appveyor.com/api/projects/status/tyep2lwnuk9k1oxx/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/jsonmasking/branch/master)
+[![codecov](https://codecov.io/gh/ThiagoBarradas/jsonmasking/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/jsonmasking)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
 [![NuGet Version](https://img.shields.io/nuget/v/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
 
