@@ -78,7 +78,7 @@ namespace JsonMasking.Tests
                 Password = 123456
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            string[] blacklist = { "password" };
+            string[] blacklist = { "*password" };
             var mask = "*******";
 
             // act
@@ -101,7 +101,7 @@ namespace JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            string[] blacklist = { "password" };
+            string[] blacklist = { "*.password" };
             var mask = "*******";
 
             // act
@@ -125,7 +125,7 @@ namespace JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            string[] blacklist = { "password" };
+            string[] blacklist = { "*password" };
             var mask = "*******";
 
             // act
@@ -149,7 +149,7 @@ namespace JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            string[] blacklist = { "password", "creditcardnumber" };
+            string[] blacklist = { "password", "*creditcardnumber" };
             var mask = "*******";
 
             // act
@@ -172,7 +172,7 @@ namespace JsonMasking.Tests
                 }
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            string[] blacklist = { "password" };
+            string[] blacklist = { "*password" };
             var mask = "*******";
 
             // act
@@ -249,6 +249,54 @@ namespace JsonMasking.Tests
 
             // assert
             Assert.StartsWith("Unexpected character encountered while parsing value", ex.Message);
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_With_Wildcard()
+        {
+            // arrange
+            var obj = new
+            {
+                DepthObject = new
+                {
+                    Test = "1",
+                    Password = "somepass#here",
+                    DepthObject = new
+                    {
+                        Test = "1",
+                        Password = "somepass#here"
+                    }
+                },
+                DepthObject2 = new
+                {
+                    Test = "1",
+                    Password = "somepass#here",
+                    DepthObject = new
+                    {
+                        Test = "1",
+                        Password = "somepass#here",
+                        DepthObject = new
+                        {
+                            Test = "1",
+                            Password = new
+                            {
+                                Test1 = "1",
+                                Password2 = "somepass#here"
+                            }
+                        }
+                    }
+                },
+                Password = "somepass#here"
+            };
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*.DepthObject*.Password" };
+            var mask = "*******";
+
+            // act
+            var result = json.MaskFields(blacklist, mask);
+
+            // assert
+            Assert.Equal("{\r\n  \"DepthObject\": {\r\n    \"Test\": \"1\",\r\n    \"Password\": \"somepass#here\",\r\n    \"DepthObject\": {\r\n      \"Test\": \"1\",\r\n      \"Password\": \"*******\"\r\n    }\r\n  },\r\n  \"DepthObject2\": {\r\n    \"Test\": \"1\",\r\n    \"Password\": \"somepass#here\",\r\n    \"DepthObject\": {\r\n      \"Test\": \"1\",\r\n      \"Password\": \"*******\",\r\n      \"DepthObject\": {\r\n        \"Test\": \"1\",\r\n        \"Password\": \"*******\"\r\n      }\r\n    }\r\n  },\r\n  \"Password\": \"somepass#here\"\r\n}", result);
         }
     }
 }

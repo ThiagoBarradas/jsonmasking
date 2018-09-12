@@ -2,7 +2,9 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace JsonMasking
 {
@@ -47,31 +49,47 @@ namespace JsonMasking
         /// <param name="token"></param>
         /// <param name="blacklist"></param>
         /// <param name="mask"></param>
+        /// <param name="namespaceItems"></param>
         private static void MaskFieldsFromJToken(JToken token, string[] blacklist, string mask)
         {
             JContainer container = token as JContainer;
             if (container == null)
             {
-                return;
+                return; // abort recursive
             }
 
             List<JToken> removeList = new List<JToken>();
-            foreach (JToken el in container.Children())
+            foreach (JToken jtoken in container.Children())
             {
-                var prop = el as JProperty;
-
-                if (prop != null && blacklist.Any(f => f.Equals(prop.Name, StringComparison.CurrentCultureIgnoreCase)))
+                if (jtoken is JProperty prop)
                 {
-                    removeList.Add(el);
+                    var matching = blacklist.Any(item =>
+                    {
+                        return 
+                            Regex.IsMatch(prop.Path, WildCardToRegular(item), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+                    });
+
+                    if (matching)
+                    {    
+                        removeList.Add(jtoken);
+                    }
                 }
-                MaskFieldsFromJToken(el, blacklist, mask);
+
+                // call recursive 
+                MaskFieldsFromJToken(jtoken, blacklist, mask);
             }
 
+            // replace 
             foreach (JToken el in removeList)
             {
                 var prop = (JProperty)el;
                 prop.Value = mask;
             }
+        }
+
+        private static string WildCardToRegular(string value)
+        {
+            return "^" + Regex.Escape(value).Replace("\\*", ".*") + "$";
         }
     }
 }

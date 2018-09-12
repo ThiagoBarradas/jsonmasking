@@ -8,6 +8,8 @@
 
 Replace fields in json, replacing by something, don't care if property is in depth objects. Very useful to replace passwords credit card number, etc.
 
+This library matching insensitive values with field namespaces. You can use wildcard * to allow any char in pattern;
+
 # Sample
 
 ```c#
@@ -18,13 +20,21 @@ var example = new
 	Password = "SomePasswordHere",
 	DepthObject = new 
 	{
-		Password = "SomePasswordHere2"
+		Password = "SomePasswordHere2",
+		Card = new 
+		{
+			Number = "555500022223333"
+		}
 	},
-	"CreditCardNumber" : "5555000011112222"
+	CreditCardNumber = "5555000011112222,
+	Card = new 
+	{
+		Number = "555500022223333"
+	}
 };
 
 var exampleAsString = JsonConvert.Serialize(example); // value must be a json string to masked
-var blacklist = new string[] { "password", "creditcardnumber" }; // insensitive
+var blacklist = new string[] { "password", "card.number", "*.card.number" "creditcardnumber" }; // insensitive
 var mask = "******";
 
 var maskedExampleAsString = exampleAsString.MaskFields(blacklist, mask);
@@ -39,9 +49,15 @@ Output
 	"SomeValue" : "Demo",
 	"Password" : "******",
 	"DepthObject" : {
-		"Password" : "******"
+		"Password" : "SomePasswordHere2", // note that password is only replaced when is in root path
+		"Card" : {
+			"Number" : "******"
+		}
 	},
-	"CreditCardNumber" : "******"
+	"CreditCardNumber" : "******,
+	"Card" : {
+		"Number" : "******"
+	}
 }
 ```
 
