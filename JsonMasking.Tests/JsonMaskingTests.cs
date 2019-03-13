@@ -25,7 +25,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"Test\": \"1\",\r\n  \"Password\": \"somepass#here\"\r\n}", result);
+            Assert.Equal("{\n  \"Test\": \"1\",\n  \"Password\": \"somepass#here\"\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"Test\": \"1\",\r\n  \"OtherField\": \"somepass#here\"\r\n}", result);
+            Assert.Equal("{\n  \"Test\": \"1\",\n  \"OtherField\": \"somepass#here\"\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"Test\": \"1\",\r\n  \"Password\": \"----\"\r\n}", result);
+            Assert.Equal("{\n  \"Test\": \"1\",\n  \"Password\": \"----\"\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"Test\": 1,\r\n  \"Password\": \"*******\"\r\n}", result);
+            Assert.Equal("{\n  \"Test\": 1,\n  \"Password\": \"*******\"\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"DepthObject\": {\r\n    \"Test\": \"1\",\r\n    \"Password\": \"*******\"\r\n  }\r\n}", result);
+            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -132,7 +132,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"Password\": \"*******\",\r\n  \"DepthObject\": {\r\n    \"Test\": \"1\",\r\n    \"Password\": \"*******\"\r\n  }\r\n}", result);
+            Assert.Equal("{\n  \"Password\": \"*******\",\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"Password\": \"*******\",\r\n  \"DepthObject\": {\r\n    \"Test\": \"1\",\r\n    \"CreditCardNumber\": \"*******\"\r\n  }\r\n}", result);
+            Assert.Equal("{\n  \"Password\": \"*******\",\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"CreditCardNumber\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -179,7 +179,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"DepthObject\": {\r\n    \"Test\": \"1\",\r\n    \"Password\": \"*******\"\r\n  }\r\n}", result);
+            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -200,7 +200,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null.\r\nParameter name: blacklist", ex.Message);
+            Assert.Equal("Value cannot be null.\nParameter name: blacklist", ex.Message.Replace("\r\n","\n"));
         }
 
         [Fact]
@@ -216,7 +216,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null.\r\nParameter name: json", ex.Message);
+            Assert.Equal("Value cannot be null.\nParameter name: json", ex.Message.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -232,7 +232,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null.\r\nParameter name: json", ex.Message);
+            Assert.Equal("Value cannot be null.\nParameter name: json", ex.Message.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -296,7 +296,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\r\n  \"DepthObject\": {\r\n    \"Test\": \"1\",\r\n    \"Password\": \"somepass#here\",\r\n    \"DepthObject\": {\r\n      \"Test\": \"1\",\r\n      \"Password\": \"*******\"\r\n    }\r\n  },\r\n  \"DepthObject2\": {\r\n    \"Test\": \"1\",\r\n    \"Password\": \"somepass#here\",\r\n    \"DepthObject\": {\r\n      \"Test\": \"1\",\r\n      \"Password\": \"*******\",\r\n      \"DepthObject\": {\r\n        \"Test\": \"1\",\r\n        \"Password\": \"*******\"\r\n      }\r\n    }\r\n  },\r\n  \"Password\": \"somepass#here\"\r\n}", result);
+            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\"\n    }\n  },\n  \"DepthObject2\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\",\n      \"DepthObject\": {\n        \"Test\": \"1\",\n        \"Password\": \"*******\"\n      }\n    }\n  },\n  \"Password\": \"somepass#here\"\n}", result.Replace("\r\n","\n"));
         }
     }
 }
