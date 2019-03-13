@@ -17,16 +17,19 @@ dotnet_csproj:
   informational_version: '%version%'
 
 before_build:
-  - choco install opencover.portable
   - choco install codecov
+  - dotnet tool install --global coverlet.console 
+  - dotnet add JsonMasking.Tests/JsonMasking.Tests.csproj package coverlet.msbuild
   - dotnet restore
 
 build:
   project: JsonMasking.sln
 
 test_script:
-  - OpenCover.Console.exe -oldstyle -register:user -target:"C:/Program Files/dotnet/dotnet.exe" -targetargs:"test --logger:trx;LogFileName=results.trx /p:DebugType=full JsonMasking.Tests\JsonMasking.Tests.csproj" -filter:"+[JsonMasking*]* -[JsonMasking.Tests*]*" -output:".\coverage.xml"
-  - codecov -f .\coverage.xml -t %CODECOV_TOKEN%
+  # Run test and generate result with opencover format
+  - dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
+  # Send test result to codecov
+  - codecov -f .\coverage.opencover.xml -t %CODECOV_TOKEN%
 
 after_test:
   - dotnet pack --configuration Release /p:Version=%version%
