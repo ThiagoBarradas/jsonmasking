@@ -37,7 +37,7 @@ test_script:
   - sh: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - sh: chmod +x ./cc-test-reporter
   - sh: ./cc-test-reporter before-build
-  - sh: ./cc-test-reporter after-build --coverage-input-type cobertura --prefix /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $?
+  - sh: ./cc-test-reporter after-build -t cobertura -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $? --debug
   
 after_test:
   - dotnet pack --configuration Release /p:Version=%version%
