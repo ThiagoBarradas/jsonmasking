@@ -30,7 +30,7 @@ test_script:
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
   - sh: mv ./JsonMasking.Tests/coverage.opencover.xml opencover.xml 
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
-  - sh: mv ./JsonMasking.Tests/coverage.lcov.xml lcov.xml 
+  - sh: mv ./JsonMasking.Tests/coverage.info lcov.info
   # Send test result to codecov
   - sh: bash <(curl -s https://codecov.io/bash) -f opencover.xml -t ${CODECOV_TOKEN}
   # Send test result to codeclimate
