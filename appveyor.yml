@@ -1,8 +1,13 @@
-image: Visual Studio 2017
+image: ubuntu
 platform: Any CPU
 
 environment:
-  version: $(APPVEYOR_BUILD_VERSION)
+  version: ${APPVEYOR_BUILD_VERSION}
+
+install:
+  - sh: dotnet tool install --global coverlet.console 
+  - sh: dotnet add JsonMasking.Tests\JsonMasking.Tests.csproj package coverlet.msbuild
+  - sh: dotnet restore
 
 configuration:
 - Release
@@ -10,26 +15,28 @@ configuration:
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
-  version: '%version%'
-  package_version: '%version%'
-  assembly_version: '%version%'
-  file_version: '%version%'
-  informational_version: '%version%'
-
-before_build:
-  - choco install codecov
-  - dotnet tool install --global coverlet.console 
-  - dotnet add JsonMasking.Tests/JsonMasking.Tests.csproj package coverlet.msbuild
-  - dotnet restore
+  version: '${version}'
+  package_version: '${version}'
+  assembly_version: '${version}'
+  file_version: '${version}'
+  informational_version: '${version}'
 
 build:
   project: JsonMasking.sln
 
 test_script:
-  # Run test and generate result with opencover format
-  - dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
+  # Run test and generate result with opencover and cobertura format
+  - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
+  - sh: mv .\JsonMasking.Tests\coverage.opencover.xml opencover.xml 
+  - sh: mv .\JsonMasking.Tests\coverage.cobertura.xml cobertura.xml 
   # Send test result to codecov
-  - codecov -f .\coverage.opencover.xml -t %CODECOV_TOKEN%
+  - sh: bash <(curl -s https://codecov.io/bash) -f .\opencover.xml -t ${CODECOV_TOKEN}
+  # Send test result to codeclimate
+  - sh: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - sh: chmod +x ./cc-test-reporter
+  - sh: ./cc-test-reporter before-build
+  - sh: ./cc-test-reporter after-build --coverage-input-type cobertura --exit-code $?
+  
 
 after_test:
   - dotnet pack --configuration Release /p:Version=%version%
