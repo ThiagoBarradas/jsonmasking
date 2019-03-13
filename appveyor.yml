@@ -32,7 +32,7 @@ test_script:
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
   - sh: mv ./JsonMasking.Tests/coverage.cobertura.xml cobertura.xml 
   # Send test result to codecov
-  - sh: bash <(curl -s https://codecov.io/bash) -f .\opencover.xml -t ${CODECOV_TOKEN}
+  - sh: bash <(curl -s https://codecov.io/bash) -f opencover.xml -t ${CODECOV_TOKEN}
   # Send test result to codeclimate
   - sh: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - sh: chmod +x ./cc-test-reporter
