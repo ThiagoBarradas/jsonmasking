@@ -4,9 +4,10 @@ platform: Any CPU
 environment:
   version: ${APPVEYOR_BUILD_VERSION}
 
+
 install:
   - sh: dotnet tool install --global coverlet.console 
-  - sh: dotnet add JsonMasking.Tests\JsonMasking.Tests.csproj package coverlet.msbuild
+  - sh: dotnet add JsonMasking.Tests/JsonMasking.Tests.csproj package coverlet.msbuild
   - sh: dotnet restore
 
 configuration:
@@ -27,8 +28,8 @@ build:
 test_script:
   # Run test and generate result with opencover and cobertura format
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
-  - sh: mv .\JsonMasking.Tests\coverage.opencover.xml opencover.xml 
-  - sh: mv .\JsonMasking.Tests\coverage.cobertura.xml cobertura.xml 
+  - sh: mv ./JsonMasking.Tests/coverage.opencover.xml opencover.xml 
+  - sh: mv ./JsonMasking.Tests/coverage.cobertura.xml cobertura.xml 
   # Send test result to codecov
   - sh: bash <(curl -s https://codecov.io/bash) -f .\opencover.xml -t ${CODECOV_TOKEN}
   # Send test result to codeclimate
@@ -42,9 +43,9 @@ after_test:
   - dotnet pack --configuration Release /p:Version=%version%
 
 artifacts:
-  - path: JsonMasking\bin\Release\netstandard2.0\JsonMasking.dll
+  - path: JsonMasking/bin/Release/netstandard2.0/JsonMasking.dll
     name: JsonMasking.dll
-  - path: JsonMasking\bin\Release\JsonMasking.%version%.nupkg
+  - path: JsonMasking/bin/Release/JsonMasking.%version%.nupkg
     name: JsonMasking.%version%.nupkg
 
 deploy:
