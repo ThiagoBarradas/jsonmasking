@@ -29,24 +29,24 @@ test_script:
   # Run test and generate result with opencover and cobertura format
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
   - sh: mv ./JsonMasking.Tests/coverage.opencover.xml opencover.xml 
-  - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
-  - sh: mv ./JsonMasking.Tests/coverage.cobertura.xml cobertura.xml 
+  - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
+  - sh: mv ./JsonMasking.Tests/coverage.lcov.xml lcov.xml 
   # Send test result to codecov
   - sh: bash <(curl -s https://codecov.io/bash) -f opencover.xml -t ${CODECOV_TOKEN}
   # Send test result to codeclimate
   - sh: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - sh: chmod +x ./cc-test-reporter
   - sh: ./cc-test-reporter before-build
-  - sh: ./cc-test-reporter after-build -t cobertura -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $?
+  - sh: ./cc-test-reporter after-build -t lcov -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $? --debug
   
 after_test:
-  - dotnet pack --configuration Release /p:Version=%version%
+  - dotnet pack --configuration Release /p:Version=${version}
 
 artifacts:
   - path: JsonMasking/bin/Release/netstandard2.0/JsonMasking.dll
     name: JsonMasking.dll
-  - path: JsonMasking/bin/Release/JsonMasking.%version%.nupkg
-    name: JsonMasking.%version%.nupkg
+  - path: JsonMasking/bin/Release/JsonMasking.${version}.nupkg
+    name: JsonMasking.${version}.nupkg
 
 deploy:
   provider: NuGet
