@@ -4,8 +4,14 @@ platform: Any CPU
 environment:
   version: ${APPVEYOR_BUILD_VERSION}
 
-
 install:
+  # Download codacy test report
+  - sh: curl -L https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar > ./codacy-test-reporter.jar
+  - sh: chmod +x ./codacy-test-reporter.jar
+  # Download codeclimate test report
+  - sh: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./codeclimate-test-reporter
+  - sh: chmod +x ./codeclimate-test-reporter
+  # Install tools for generate 
   - sh: dotnet tool install --global coverlet.console 
   - sh: dotnet add JsonMasking.Tests/JsonMasking.Tests.csproj package coverlet.msbuild
   - sh: dotnet restore
@@ -26,21 +32,22 @@ build:
   project: JsonMasking.sln
 
 test_script:
-  # Run test and generate result with opencover and cobertura format
+  # Run test and generate result with opencover and lcov format
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
   - sh: mv ./JsonMasking.Tests/coverage.opencover.xml opencover.xml 
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
   - sh: mkdir coverage
   - sh: mv ./JsonMasking.Tests/coverage.info coverage/lcov.info
-  # Send test result to codecov
-  - sh: bash <(curl -s https://codecov.io/bash) -f opencover.xml -t ${CODECOV_TOKEN}
-  # Send test result to codeclimate
-  - sh: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - sh: chmod +x ./cc-test-reporter
-  - sh: ./cc-test-reporter before-build
-  - sh: ./cc-test-reporter after-build -t lcov -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $? --debug
   
 after_test:
+  # Send test result to codecov
+  - sh: bash < (curl -s https://codecov.io/bash) -f opencover.xml -t ${CODECOV_TOKEN}
+  # Send test result to codeclimate
+  - sh: ./codeclimate-test-reporter before-build
+  - sh: ./codeclimate-test-reporter after-build -t lcov -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $? --debug
+  # Send test result to codacy
+  - sh: java -jar ./codacy-test-reporter.jar report -l dotnet -t ${CODACY_PROJECT_TOKEN} -r coverage/lcov.info
+  # Pack to nuget 
   - dotnet pack --configuration Release /p:Version=${version}
 
 artifacts:
