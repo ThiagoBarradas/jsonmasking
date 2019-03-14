@@ -41,7 +41,7 @@ test_script:
   
 after_test:
   # Send test result to codecov
-  - sh: bash < (curl -s https://codecov.io/bash) -f opencover.xml -t ${CODECOV_TOKEN}
+  - sh: bash <(curl -s https://codecov.io/bash) -f opencover.xml -t ${CODECOV_TOKEN}
   # Send test result to codeclimate
   - sh: ./codeclimate-test-reporter before-build
   - sh: ./codeclimate-test-reporter after-build -t lcov -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $? --debug
