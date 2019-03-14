@@ -11,6 +11,8 @@ install:
   # Download codeclimate test report
   - sh: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./codeclimate-test-reporter
   - sh: chmod +x ./codeclimate-test-reporter
+  # Download sonarqube scanner / report
+  - sh: dotnet tool install --global dotnet-sonarscanner
   # Install tools for generate 
   - sh: dotnet tool install --global coverlet.console 
   - sh: dotnet add JsonMasking.Tests/JsonMasking.Tests.csproj package coverlet.msbuild
@@ -27,6 +29,11 @@ dotnet_csproj:
   assembly_version: '${version}'
   file_version: '${version}'
   informational_version: '${version}'
+
+after_build:
+  - sh: dotnet build-server shutdown
+  # Setup sonarqube
+  - sh: dotnet sonarscanner begin /k:ThiagoBarradas_jsonmasking /v:${version} /d:sonar.host.url=https://sonarcloud.io /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.cs.opencover.reportsPaths="opencover.xml" 
 
 build:
   project: JsonMasking.sln
@@ -49,6 +56,8 @@ after_test:
   - sh: ./codeclimate-test-reporter after-build -t lcov -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $?
   # Send test result to codacy
   - sh: java -jar ./codacy-test-reporter.jar report -l CSharp -t ${CODACY_PROJECT_TOKEN} -r cobertura.xml
+  # Send test result to sonarqube
+  - sh: dotnet sonarscanner end /d:sonar.login=${SONARQUBE_TOKEN}
   # Pack to nuget 
   - dotnet pack --configuration Release /p:Version=${version}
 
