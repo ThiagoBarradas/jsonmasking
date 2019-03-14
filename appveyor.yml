@@ -32,9 +32,11 @@ build:
   project: JsonMasking.sln
 
 test_script:
-  # Run test and generate result with opencover and lcov format
+  # Run test and generate result with opencover, cobertura and lcov format
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
   - sh: mv ./JsonMasking.Tests/coverage.opencover.xml opencover.xml 
+  - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
+  - sh: mv ./JsonMasking.Tests/coverage.cobertura.xml cobertura.xml 
   - sh: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov /p:CoverletOutput=coverage /p:Exclude=[xunit.*]* JsonMasking.sln
   - sh: mkdir coverage
   - sh: mv ./JsonMasking.Tests/coverage.info coverage/lcov.info
@@ -46,7 +48,7 @@ after_test:
   - sh: ./codeclimate-test-reporter before-build
   - sh: ./codeclimate-test-reporter after-build -t lcov -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $?
   # Send test result to codacy
-  - sh: java -jar ./codacy-test-reporter.jar report --force-language -l "C#" -t ${CODACY_PROJECT_TOKEN} -r coverage/lcov.info
+  - sh: java -jar ./codacy-test-reporter.jar report --force-language -l "C#" -t ${CODACY_PROJECT_TOKEN} -r cobertura.xml
   # Pack to nuget 
   - dotnet pack --configuration Release /p:Version=${version}
 
