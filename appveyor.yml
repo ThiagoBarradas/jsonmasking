@@ -46,7 +46,7 @@ after_test:
   - sh: ./codeclimate-test-reporter before-build
   - sh: ./codeclimate-test-reporter after-build -t lcov -r ${CC_TEST_REPORTER_ID} -p /home/appveyor/projects/newtonsoft-extensions-jsonmasking/ --exit-code $? --debug
   # Send test result to codacy
-  - sh: java -jar ./codacy-test-reporter.jar report -l dotnet -t ${CODACY_PROJECT_TOKEN} -r coverage/lcov.info
+  - sh: java -jar ./codacy-test-reporter.jar report -l "C#" -t ${CODACY_PROJECT_TOKEN} -r coverage/lcov.info
   # Pack to nuget 
   - dotnet pack --configuration Release /p:Version=${version}
 
