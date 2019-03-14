@@ -10,7 +10,8 @@
 
 ## Sonarqube
 
-:construction:
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ThiagoBarradas_jsonmasking&metric=alert_status)](https://sonarcloud.io/dashboard?id=ThiagoBarradas_jsonmasking)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ThiagoBarradas_jsonmasking&metric=coverage)](https://sonarcloud.io/dashboard?id=ThiagoBarradas_jsonmasking)
 
 ## AppVeyor / Codecov
 
