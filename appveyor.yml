@@ -33,7 +33,7 @@ dotnet_csproj:
 after_build:
   - sh: dotnet build-server shutdown
   # Setup sonarqube
-  - sh: dotnet sonarscanner begin /k:ThiagoBarradas_jsonmasking /v:${version} /d:sonar.host.url=https://sonarcloud.io /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.cs.opencover.reportsPaths="opencover.xml" 
+  - sh: dotnet sonarscanner begin /d:sonar.organization=thiagobarradas-github /k:ThiagoBarradas_jsonmasking /v:${version} /d:sonar.host.url=https://sonarcloud.io /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.cs.opencover.reportsPaths="opencover.xml" 
 
 build:
   project: JsonMasking.sln
