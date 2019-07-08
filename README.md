@@ -1,6 +1,6 @@
 [![Build Status](https://barradas.visualstudio.com/Contributions/_apis/build/status/ThiagoBarradas.jsonmasking?branchName=master)](https://barradas.visualstudio.com/Contributions/_build/latest?definitionId=1&branchName=master)
 [![CircleCI](https://circleci.com/gh/ThiagoBarradas/jsonmasking.svg?style=shield)](https://circleci.com/gh/ThiagoBarradas/jsonmasking)
-[![Build status](https://ci.appveyor.com/api/projects/status/tyep2lwnuk9k1oxx/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/jsonmasking/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/tyep2lwnuk9k1oxx/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/newtonsoft-extensions-jsonmasking/branch/master)
 [![codecov](https://codecov.io/gh/ThiagoBarradas/jsonmasking/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/jsonmasking)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
 [![NuGet Version](https://img.shields.io/nuget/v/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
