@@ -1,0 +1,61 @@
+version: 2
+jobs:
+  build:
+    working_directory: /app
+    docker:
+      - image: microsoft/dotnet:2.2-sdk
+    steps:
+      - checkout
+      - run:
+          name: Checking files
+          command: ls -al
+      - run:
+          name: Restoring nuget packages
+          command: dotnet restore
+      - run:
+          name: Publishing app
+          command: dotnet publish -c Release -o binn
+      - store_artifacts:
+          path: /app/JsonMasking/binn
+          destination: app-artifact
+      - persist_to_workspace:
+          root: /
+          paths:
+            - app
+ 
+  unit_tests:
+    working_directory: /
+    docker:
+      - image: microsoft/dotnet:2.2-sdk
+    steps:
+      - attach_workspace:
+          at: /
+      - run:
+          name: Checking files
+          command: ls /app      
+      - run:
+          name: Install coverlet
+          command: |
+            dotnet tool install --global coverlet.console 
+            cd /app/JsonMasking.Tests
+            dotnet add package coverlet.msbuild
+      - run:
+          name: Running unit tests
+          command: |
+            dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=/test-result/result /p:Exclude=[xunit.*]* /app/JsonMasking.sln
+      - store_artifacts:
+          path: /test-result
+          destination: test-result
+      - persist_to_workspace:
+          root: /
+          paths:
+            - test-result
+
+workflows:
+  version: 2
+  build_publish_deploy:
+    jobs:
+      - build
+      - unit_tests:
+          requires:
+            - build
