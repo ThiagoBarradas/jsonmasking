@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/ThiagoBarradas/jsonmasking.svg?style=shield)](https://circleci.com/gh/ThiagoBarradas/jsonmasking)
 [![Build status](https://ci.appveyor.com/api/projects/status/tyep2lwnuk9k1oxx/branch/master?svg=true)](https://ci.appveyor.com/project/ThiagoBarradas/jsonmasking/branch/master)
 [![codecov](https://codecov.io/gh/ThiagoBarradas/jsonmasking/branch/master/graph/badge.svg)](https://codecov.io/gh/ThiagoBarradas/jsonmasking)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
