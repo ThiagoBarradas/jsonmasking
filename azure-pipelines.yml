@@ -1,0 +1,54 @@
+variables:
+  project_name: 'JsonMasking'
+
+jobs:
+- job: Build
+  steps:
+  - script: |
+     pwd && ls -la
+     dotnet restore 
+     dotnet publish -c Release -o bin/Release/netstandard2.0
+     mkdir artifact
+     cp -r $(project_name)/bin/Release/netstandard2.0 artifact/$(Build.SourceBranchName)
+    displayName: Build Application
+  - task: PublishPipelineArtifact@1
+    displayName: Store Application Artifact
+    inputs:
+      path: $(System.DefaultWorkingDirectory)/artifact
+      artifact: $(project_name)
+
+- job: UnitTests
+  dependsOn: Build
+  steps:
+  - script: |
+      dotnet tool install --global coverlet.console 
+      dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
+      dotnet add $(project_name).Tests/$(project_name).Tests.csproj package coverlet.msbuild
+      dotnet add $(project_name).Tests/$(project_name).Tests.csproj package XunitXml.TestLogger
+      dotnet test /p:CollectCoverage=true \
+                  /p:CoverletOutputFormat=\"opencover,cobertura\" \
+                  /p:CoverletOutput=results/result \
+                  /p:Exclude=[xunit.*]* $(project_name).sln \
+                  --test-adapter-path:. --logger:"xunit;LogFilePath=results/result.xunit.xml"
+      ./reportgenerator "-reports:$(project_name).Tests/results/result.opencover.xml" \
+                        "-targetdir:$(project_name).Tests/results/Cobertura" \
+                        "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+    displayName: Running Unit Tests
+  - task: PublishPipelineArtifact@1
+    displayName: Store Test Result
+    inputs:
+      path: $(System.DefaultWorkingDirectory)/$(project_name).Tests/results
+      artifact: UnitTestResults
+  - task: PublishCodeCoverageResults@1
+    displayName: Publish Code Coverage 
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: $(System.DefaultWorkingDirectory)/$(project_name).Tests/results/result.cobertura.xml
+      pathToSources: .
+      failIfCoverageEmpty: true
+  - task: PublishTestResults@2
+    displayName: Publish Test Result
+    inputs:
+      testResultsFormat: 'XUnit'
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/$(project_name).Tests/results/result.xunit.xml'
+      testRunTitle: 'Collecting Test Results'
