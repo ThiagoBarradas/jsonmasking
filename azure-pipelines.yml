@@ -21,21 +21,18 @@ variables:
 
 trigger:
   branches:
-    includes:
+    include:
     - release/*  
     - hotfix/*
     - develop
   tags:
-    includes: 
+    include: 
     - *.*.*
 
 pr:
   branches:
-    includes:
+    include:
     - develop
-  tags: 
-    includes: 
-    - *.*.*
 
 pool:
   vmImage: 'ubuntu-latest'
