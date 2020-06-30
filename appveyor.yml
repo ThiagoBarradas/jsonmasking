@@ -67,7 +67,7 @@ artifacts:
   - path: JsonMasking/bin/Release/JsonMasking.${version}.nupkg
     name: JsonMasking.${version}.nupkg
 
-deploy:
-  provider: NuGet
-  api_key:
-    secure: csyDlyeSjDmdYAQ/PK0GYNZ4ofK/yC6vd5ZLPnG2TgujmrAW7fUiQxjDVOWD4XAX
+ #deploy:
+ #  provider: NuGet
+ #  api_key:
+ #    secure: csyDlyeSjDmdYAQ/PK0GYNZ4ofK/yC6vd5ZLPnG2TgujmrAW7fUiQxjDVOWD4XAX
