@@ -12,21 +12,30 @@ variables:
   sdk_project_path: 'JsonMasking/JsonMasking.csproj'
   net_version: 'netstandard2.0'
   execute_test: 'true'
-  test_project_base_folder: 'JsonMasking.Test'
-  test_project_path: 'JsonMasking.Test/JsonMasking.Test.csproj'
+  test_project_base_folder: 'JsonMasking.Tests'
+  test_project_path: 'JsonMasking.Tests/JsonMasking.Tests.csproj'
   execute_sonarcloud: 'true'
   sonarcloud_project: 'ThiagoBarradas_jsonmasking'
   sonarcloud_organization: 'thiagobarradas-github'
   sonarcloud_account: 'SonarCloudBarradas' 
 
 trigger:
-- release/*  
-- hotfix/* 
-- master
-- develop
+  branches:
+    includes:
+    - release/*  
+    - hotfix/*
+    - develop
+  tags:
+    includes: 
+    - *.*.*
 
 pr:
-- develop
+  branches:
+    includes:
+    - develop
+  tags: 
+    includes: 
+    - *.*.*
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -174,15 +183,17 @@ stages:
 
   - job: PackingNuget
     dependsOn:
+    - UpdateBuildVersion
+    - Build
     - UnitTests
     - QualityAnalysis 
-    - Build
-    - UpdateBuildVersion
     workspace:
       clean: all
     condition: |
       and
       (
+        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
         in(dependencies.QualityAnalysis.result, 'Succeeded', 'Skipped'),
         or
         (
