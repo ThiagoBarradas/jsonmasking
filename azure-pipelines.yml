@@ -26,7 +26,8 @@ trigger:
     - hotfix/*
     - develop
   tags:
-    include: '*'
+    include: 
+    - '*'
 
 pr:
   branches:
