@@ -226,7 +226,7 @@ stages:
         or
         (
           contains(variables['Build.SourceBranch'], '/hotfix/'),
-          contains(variables['Build.SourceBranch'], '/release
+          contains(variables['Build.SourceBranch'], '/release/'),
           contains(variables['Build.SourceBranch'], '/tags/')
         )
       )
