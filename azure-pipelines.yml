@@ -219,7 +219,7 @@ stages:
     condition: |
       and
       (
-        in(dependencies.UpdateBuildVersion.result, 'Succeeded'),
+        eq(dependencies.UpdateBuildVersion.result, 'Succeeded'),
         in(dependencies.Build.result, 'Succeeded', 'Skipped'),
         in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
         in(dependencies.QualityAnalysis.result, 'Succeeded', 'Skipped'),
