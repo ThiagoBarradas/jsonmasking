@@ -52,6 +52,7 @@ stages:
       inputs:
         updateAssemblyInfo: false
     - bash: |
+        env && export
         if [[ "$(Build.SourceBranch)" =~ "/hotfix/" ]] ||
            [[ "$(Build.SourceBranch)" =~ "/release/" ]]; 
         then
