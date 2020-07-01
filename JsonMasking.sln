@@ -1,23 +1,35 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMasking", "JsonMasking\JsonMasking.csproj", "{124D3B3E-3282-4A2D-89F1-8384CFBE4889}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMasking", "JsonMasking\JsonMasking.csproj", "{124D3B3E-3282-4A2D-89F1-8384CFBE4889}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{323DA697-4C17-4AFD-98D0-2C8135AF2001}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMasking.Tests", "JsonMasking.Tests\JsonMasking.Tests.csproj", "{0F9ABAF8-E1A8-47C3-90BD-53F0A967271C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "git", "git", "{85DD2CC9-2969-47D9-81D4-2B61D3943151}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{E18D0D3B-4D8E-4B89-883B-8DB0DC2E98B5}"
+	ProjectSection(SolutionItems) = preProject
 		.github\CONTRIBUTING.md = .github\CONTRIBUTING.md
 		.github\ISSUE_TEMPLATE.md = .github\ISSUE_TEMPLATE.md
 		LICENSE = LICENSE
 		.github\PULL_REQUEST_TEMPLATE.md = .github\PULL_REQUEST_TEMPLATE.md
+		QA.md = QA.md
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMasking.Tests", "JsonMasking.Tests\JsonMasking.Tests.csproj", "{0F9ABAF8-E1A8-47C3-90BD-53F0A967271C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "devops", "devops", "{7C946BE2-D6FE-4831-88A3-63CD9BE030C7}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		azure-pipelines.yml = azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +48,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{85DD2CC9-2969-47D9-81D4-2B61D3943151} = {323DA697-4C17-4AFD-98D0-2C8135AF2001}
+		{E18D0D3B-4D8E-4B89-883B-8DB0DC2E98B5} = {323DA697-4C17-4AFD-98D0-2C8135AF2001}
+		{7C946BE2-D6FE-4831-88A3-63CD9BE030C7} = {323DA697-4C17-4AFD-98D0-2C8135AF2001}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {031A14D9-8A4F-4DEF-B742-868DCA99A53E}
