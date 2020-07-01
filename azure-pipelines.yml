@@ -64,7 +64,7 @@ stages:
             echo "         $(Build.SourceBranchName)-preview.$(current_counter)"
             echo "##vso[build.updatebuildnumber]$(Build.SourceBranchName)-preview.$(current_counter)"
             echo "##vso[task.setvariable variable=PureVersion;isOutput=true]$(Build.SourceBranchName)"
-        elif [ "$(Build.SourceBranch)" =~ "/tags/" ];
+        elif [[ "$(Build.SourceBranch)" =~ "/tags/" ]];
         then
             echo "Generate Release Version"
             echo "Version: $(GitVersion.SemVer)"
@@ -72,7 +72,7 @@ stages:
             echo "##vso[task.setvariable variable=PureVersion;isOutput=true]$(GitVersion.SemVer)"
         else
             echo "Generate Development Version"
-            echo "##vso[build.updatebuildnumber]$(GitVersion.SemVer).0"
+            echo "##vso[build.updatebuildnumber]$(Build.BuildNumber).0-develop"
             echo "Version: $(Build.BuildNumber).0-develop"
         fi
       displayName: Update Version Number
