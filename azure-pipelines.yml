@@ -1,54 +1,249 @@
+# - requires:
+# https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarcloud
+# https://marketplace.visualstudio.com/items?itemName=SimondeLang.sonarcloud-buildbreaker
+# https://marketplace.visualstudio.com/items?itemName=gittools.gitversion
+# 
+# - CI/CD for git flow
+# - for linux environment
+
 variables:
-  project_name: 'JsonMasking'
+  solution_path: 'JsonMasking.sln'
+  sdk_project_name: 'JsonMasking'
+  sdk_project_path: 'JsonMasking/JsonMasking.csproj'
+  net_version: 'netstandard2.0'
+  execute_test: 'true'
+  test_project_base_folder: 'JsonMasking.Tests'
+  test_project_path: 'JsonMasking.Tests/JsonMasking.Tests.csproj'
+  execute_sonarcloud: 'true'
+  sonarcloud_project: 'ThiagoBarradas_jsonmasking'
+  sonarcloud_organization: 'thiagobarradas-github'
+  sonarcloud_account: 'SonarCloudBarradas' 
 
-jobs:
-- job: Build
-  steps:
-  - script: |
-     pwd && ls -la
-     dotnet restore 
-     dotnet publish -c Release -o bin/Release/netstandard2.0
-     mkdir artifact
-     cp -r $(project_name)/bin/Release/netstandard2.0 artifact/$(Build.SourceBranchName)
-    displayName: Build Application
-  - task: PublishPipelineArtifact@1
-    displayName: Store Application Artifact
-    inputs:
-      path: $(System.DefaultWorkingDirectory)/artifact
-      artifact: $(project_name)
+trigger:
+  branches:
+    include:
+    - release/*  
+    - hotfix/*
+    - develop
+  tags:
+    include: 
+    - '*'
 
-- job: UnitTests
-  dependsOn: Build
-  steps:
-  - script: |
-      dotnet tool install --global coverlet.console 
-      dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
-      dotnet add $(project_name).Tests/$(project_name).Tests.csproj package coverlet.msbuild
-      dotnet add $(project_name).Tests/$(project_name).Tests.csproj package XunitXml.TestLogger
-      dotnet test /p:CollectCoverage=true \
-                  /p:CoverletOutputFormat=\"opencover,cobertura\" \
-                  /p:CoverletOutput=results/result \
-                  /p:Exclude=[xunit.*]* $(project_name).sln \
-                  --test-adapter-path:. --logger:"xunit;LogFilePath=results/result.xunit.xml"
-      ./reportgenerator "-reports:$(project_name).Tests/results/result.opencover.xml" \
-                        "-targetdir:$(project_name).Tests/results/Cobertura" \
-                        "-reporttypes:Cobertura;HTMLInline;HTMLChart"
-    displayName: Running Unit Tests
-  - task: PublishPipelineArtifact@1
-    displayName: Store Test Result
-    inputs:
-      path: $(System.DefaultWorkingDirectory)/$(project_name).Tests/results
-      artifact: UnitTestResults
-  - task: PublishCodeCoverageResults@1
-    displayName: Publish Code Coverage 
-    inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: $(System.DefaultWorkingDirectory)/$(project_name).Tests/results/result.cobertura.xml
-      pathToSources: .
-      failIfCoverageEmpty: true
-  - task: PublishTestResults@2
-    displayName: Publish Test Result
-    inputs:
-      testResultsFormat: 'XUnit'
-      testResultsFiles: '$(System.DefaultWorkingDirectory)/$(project_name).Tests/results/result.xunit.xml'
-      testRunTitle: 'Collecting Test Results'
+pr:
+  branches:
+    include:
+    - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: BuildApp
+  jobs:
+  - job: UpdateBuildVersion
+    workspace:
+      clean: all
+    variables: 
+      current_counter: $[counter(variables['Build.SourceBranchName'], 1)]    
+    steps:
+    - task: gittools.gitversion.gitversion-task.GitVersion@5
+      condition: eq(variables['Build.SourceBranchName'], 'master')
+      displayName: 'Get version from git tag for master'
+      inputs:
+        updateAssemblyInfo: false
+    - bash: |
+        if [[ "$(Build.SourceBranch)" =~ "/hotfix/" ]] ||
+           [[ "$(Build.SourceBranch)" =~ "/release/" ]]; 
+        then
+            echo "Generate Preview Release Version"
+            echo "Version: $(Build.SourceBranchName)"
+            echo "         $(Build.SourceBranchName)-preview.$(current_counter)"
+            echo "##vso[build.updatebuildnumber]$(Build.SourceBranchName)-preview.$(current_counter)"
+            echo "##vso[task.setvariable variable=PureVersion;isOutput=true]$(Build.SourceBranchName)"
+        elif [ "$(Build.SourceBranchName)" = "master" ];
+        then
+            echo "Generate Release Version"
+            echo "Version: $(GitVersion.SemVer)"
+            echo "##vso[build.updatebuildnumber]$(GitVersion.SemVer)"
+            echo "##vso[task.setvariable variable=PureVersion;isOutput=true]$(GitVersion.SemVer)"
+        else
+            echo "Generate Development Version"
+            echo "Version: $(Build.BuildNumber)"
+        fi
+      displayName: Update Version Number
+      name: UpdateBuildVersionTask
+
+  - job: Build
+    dependsOn: UpdateBuildVersion
+    condition: succeeded()
+    workspace:
+      clean: all
+    steps:
+    - script: |
+        pwd && ls -la 
+        dotnet restore "$(solution_path)" 
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/bin "$(sdk_project_path)"
+        mkdir artifact
+        cp -r $(System.DefaultWorkingDirectory)/bin artifact/bin
+      displayName: Build Application
+    - task: PublishPipelineArtifact@1
+      displayName: Store Application Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/artifact
+        artifact: $(sdk_project_name)
+
+  - job: UnitTests
+    dependsOn: Build
+    workspace:
+      clean: all
+    condition: and(succeeded(), eq(variables['execute_test'], 'true'))
+    steps:
+    - script: | 
+        dotnet tool install --global coverlet.console 
+        dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
+        dotnet add $(test_project_path) package coverlet.msbuild
+        dotnet add $(test_project_path) package XunitXml.TestLogger
+        dotnet test /p:CollectCoverage=true \
+                    /p:CoverletOutputFormat=\"opencover,cobertura\" \
+                    /p:CoverletOutput=results/result \
+                    /p:Exclude=[xunit.*]* "$(solution_path)" \
+                    --test-adapter-path:. --logger:"xunit;LogFilePath=results/result.xunit.xml"
+        ./reportgenerator "-reports:$(test_project_base_folder)/results/result.opencover.xml" \
+                          "-targetdir:$(test_project_base_folder)/results/Cobertura" \
+                          "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+        echo "##vso[task.setvariable variable=OpencoverSonar;isOutput=true]sonar.cs.opencover.reportsPaths=$(Pipeline.Workspace)/result.opencover.xml"
+        ls $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results
+      displayName: Running Unit Tests
+      name: UnitTestsTask
+    - task: PublishPipelineArtifact@1
+      displayName: Store Test Result
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results
+        artifact: UnitTestResults
+    - task: PublishCodeCoverageResults@1
+      displayName: Publish Code Coverage 
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.cobertura.xml
+        pathToSources: .
+        failIfCoverageEmpty: true
+    - task: PublishTestResults@2
+      displayName: Publish Test Result
+      inputs:
+        testResultsFormat: 'XUnit'
+        testResultsFiles: '$(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.xunit.xml'
+        testRunTitle: 'Collecting Test Results'
+
+  - job: QualityAnalysis
+    dependsOn: UnitTests
+    condition: |
+      and
+      (
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        eq(variables['execute_sonarcloud'], 'true')
+      )
+    workspace:
+      clean: all
+    variables:
+      OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: Get Test Result
+      condition: eq(variables['execute_test'], 'true')
+      inputs:
+        artifact: UnitTestResults
+    - task: SonarCloudPrepare@1
+      displayName: Start Sonarqube Analysis
+      inputs:
+        SonarCloud: '$(sonarcloud_account)'
+        organization: '$(sonarcloud_organization)'
+        scannerMode: 'MSBuild'
+        projectKey: '$(sonarcloud_project)'
+        projectName: '$(sdk_project_name)'
+        extraProperties: |
+          sonar.sourceEncoding=UTF-8
+          sonar.scm.forceReloadAll=true
+          $(OpencoverSonar)
+    - script: |
+        dotnet build "$(solution_path)"
+      displayName: Runnig Build For Analysis
+    - task: SonarCloudAnalyze@1
+      displayName: Finish Sonarqube Analysis
+    - task: SonarCloudPublish@1
+      displayName: Publish Sonarqube Analysis
+      inputs:
+        pollingTimeoutSec: '300'
+    - task: sonarcloud-buildbreaker@2
+      inputs:
+        SonarCloud: '$(sonarcloud_account)'
+        organization: '$(sonarcloud_organization)'
+
+  - job: PackingNuget
+    dependsOn:
+    - UpdateBuildVersion
+    - Build
+    - UnitTests
+    - QualityAnalysis 
+    workspace:
+      clean: all
+    condition: |
+      and
+      (
+        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        in(dependencies.QualityAnalysis.result, 'Succeeded', 'Skipped'),
+        or
+        (
+          contains(variables['Build.SourceBranch'], '/hotfix/'),
+          contains(variables['Build.SourceBranch'], '/release/'),
+          eq(variables['Build.SourceBranchName'], 'master')
+        )
+      )
+    variables:
+      ReleaseVersion: $(Build.BuildNumber) 
+      PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: 'Packing Release'
+      inputs:
+        command: 'custom'
+        projects: '$(sdk_project_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: PublishPipelineArtifact@1
+      displayName: Store Nuget Packages
+      inputs:
+        path: '$(Build.ArtifactStagingDirectory)'
+        artifact: NugetPackage
+
+- stage: DeployPackage
+  dependsOn: BuildApp 
+  condition: |
+    and
+    (
+      succeeded(), 
+      or
+      ( 
+        contains(variables['Build.SourceBranch'], '/hotfix/'),
+        contains(variables['Build.SourceBranch'], '/release/'),
+        eq(variables['Build.SourceBranchName'], 'master')
+      )
+    )
+  variables:
+    - group: NugetCredentials
+  jobs:
+  - job: PublishNugetPackage
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: Get Application Artifact
+      inputs:
+        artifact: NugetPackage
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish package in NuGet'
+      inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+          push $(Pipeline.Workspace)/$(sdk_project_name).$(Build.BuildNumber).nupkg
+          -s $(NugetServerUrl)
+          -k $(NugetApiKey)
