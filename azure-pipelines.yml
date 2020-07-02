@@ -176,7 +176,7 @@ stages:
     workspace:
       clean: all
     variables:
-      OpencoverSonar: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.SonarMasterWhenTag'] ]
+      SonarMasterWhenTag: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.SonarMasterWhenTag'] ]
       OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
     steps:
     - task: DownloadPipelineArtifact@2
@@ -196,6 +196,7 @@ stages:
           sonar.sourceEncoding=UTF-8
           sonar.scm.forceReloadAll=true
           $(OpencoverSonar)
+          $(SonarMasterWhenTag)
     - script: |
         dotnet build "$(solution_path)"
       displayName: Runnig Build For Analysis
