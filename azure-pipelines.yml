@@ -36,7 +36,7 @@ pr:
     - develop
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest' 
 
 stages:
 - stage: BuildApp
