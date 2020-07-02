@@ -1,4 +1,4 @@
-[![Build Status](https://barradas.visualstudio.com/Contributions/_apis/build/status/NugetPackage/JsonMasking?branchName=master)](https://barradas.visualstudio.com/Contributions/_build/latest?definitionId=1&branchName=master)
+[![Build Status](https://barradas.visualstudio.com/Contributions/_apis/build/status/NugetPackage/JsonMasking?branchName=develop)](https://barradas.visualstudio.com/Contributions/_build/latest?definitionId=1&branchName=develop)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ThiagoBarradas_jsonmasking&metric=alert_status)](https://sonarcloud.io/dashboard?id=ThiagoBarradas_jsonmasking)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ThiagoBarradas_jsonmasking&metric=coverage)](https://sonarcloud.io/dashboard?id=ThiagoBarradas_jsonmasking)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/JsonMasking.svg)](https://www.nuget.org/packages/JsonMasking/)
