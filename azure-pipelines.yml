@@ -36,7 +36,7 @@ pr:
     - develop
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest' 
 
 stages:
 - stage: BuildApp
@@ -69,6 +69,7 @@ stages:
             echo "Generate Release Version"
             echo "Version: $(Build.SourceBranchName)"
             echo "##vso[build.updatebuildnumber]$(Build.SourceBranchName)"
+            echo "##vso[task.setvariable variable=SonarMasterWhenTag;isOutput=true]sonar.branch.name=master"
             echo "##vso[task.setvariable variable=PureVersion;isOutput=true]$(Build.SourceBranchName)"
         else
             echo "Generate Development Version"
@@ -175,6 +176,7 @@ stages:
     workspace:
       clean: all
     variables:
+      SonarMasterWhenTag: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.SonarMasterWhenTag'] ]
       OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
     steps:
     - task: DownloadPipelineArtifact@2
@@ -194,6 +196,7 @@ stages:
           sonar.sourceEncoding=UTF-8
           sonar.scm.forceReloadAll=true
           $(OpencoverSonar)
+          $(SonarMasterWhenTag)
     - script: |
         dotnet build "$(solution_path)"
       displayName: Runnig Build For Analysis
