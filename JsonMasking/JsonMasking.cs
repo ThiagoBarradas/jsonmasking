@@ -138,7 +138,7 @@ namespace JsonMasking
                 {
                     var value = prop.Value.ToString();
                     var valueMasked = maskFunc(value);
-                    prop.Value = (valueMasked != value && valueMasked.Contains("*")) ? valueMasked : mask;
+                    prop.Value = (valueMasked != value) ? valueMasked : mask;
                 }
                 else
                 {
@@ -149,11 +149,6 @@ namespace JsonMasking
 
         private static string GetKey(this Dictionary<string, Func<string, string>> blacklistPartial, string key)
         {
-            if (String.IsNullOrEmpty(key))
-            {
-                return key;
-            }
-
             var result = blacklistPartial.Keys.FirstOrDefault(dictionaryKey =>
             {
                 return IsMatch(key, dictionaryKey);
@@ -165,7 +160,6 @@ namespace JsonMasking
         private static bool IsMatch(string key, string value)
         {
             return Regex.IsMatch(key, WildCardToRegular(value), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
         }
 
         private static string WildCardToRegular(string value)
