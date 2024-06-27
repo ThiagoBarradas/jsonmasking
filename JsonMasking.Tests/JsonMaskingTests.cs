@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using JsonMasking;
 using System;
 using Xunit;
+using JsonMasking.Tests.Mocks;
 
 namespace JsonMasking.Tests
 {
@@ -297,6 +298,173 @@ namespace JsonMasking.Tests
 
             // assert
             Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\"\n    }\n  },\n  \"DepthObject2\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\",\n      \"DepthObject\": {\n        \"Test\": \"1\",\n        \"Password\": \"*******\"\n      }\n    }\n  },\n  \"Password\": \"somepass#here\"\n}", result.Replace("\r\n","\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_Partial_With_Single_Field()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"462294*****9865\",\n    \"Password\": \"somepass#here2\"\n  }\n}";
+
+            var blacklistPartialMock = BlacklistPartialMock.DefaultBlackListPartial;
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2"
+                }
+            };
+
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_Partial_And_Completely_With_Single_Field()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"462294*****9865\",\n    \"Password\": \"----\"\n  },\n  \"Password\": \"----\"\n}";
+
+            var blacklistPartialMock = BlacklistPartialMock.DefaultBlackListPartial;
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2"
+                },
+                Password = "somepass#here2"
+            };
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number", "*password" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_Partial_With_Multiple_Fields()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"462294*****9865\",\n    \"Password\": \"somepass#here2\",\n    \"Card\": {\n      \"Number\": \"462294*****9865\"\n    },\n    \"Teste\": {\n      \"Card\": {\n        \"Number\": \"462294*****9865\"\n      }\n    }\n  }\n}";
+
+            var blacklistPartialMock = BlacklistPartialMock.DefaultBlackListPartial;
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2",
+                    Card = new
+                    {
+                        Number = "4622943127049865",
+                    },
+                    Teste = new
+                    {
+                        Card = new
+                        {
+                            Number = "4622943127049865",
+                        }
+                    }
+
+                }
+            };
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_Partial_And_Completely_With_Multiple_Field()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"462294*****9865\",\n    \"Password\": \"----\",\n    \"Card\": {\n      \"Number\": \"462294*****9865\",\n      \"Password\": \"----\"\n    },\n    \"Teste\": {\n      \"Card\": {\n        \"Number\": \"462294*****9865\",\n        \"Password\": \"----\"\n      }\n    }\n  }\n}";
+
+            var blacklistPartialMock = BlacklistPartialMock.DefaultBlackListPartial;
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2",
+                    Card = new
+                    {
+                        Number = "4622943127049865",
+                        Password = "somepass#here2"
+                    },
+                    Teste = new
+                    {
+                        Card = new
+                        {
+                            Number = "4622943127049865",
+                            Password = "somepass#here2"
+                        }
+                    }
+                }
+            };
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number", "*password" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Not_Mask_Partial_If_Property_IsNot_In_Blacklist()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"4622943127049865\",\n    \"Password\": \"somepass#here2\"\n  }\n}";
+
+            var blacklistPartialMock = BlacklistPartialMock.DefaultBlackListPartial;
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2"
+                }
+            };
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
         }
     }
 }
