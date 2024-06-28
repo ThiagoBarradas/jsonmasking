@@ -14,6 +14,8 @@ This library matching insensitive values with field namespaces. You can use wild
 
 ```c#
 
+- Completely masking some of the properties
+
 var example = new 
 {
 	SomeValue = "Demo",
@@ -59,6 +61,69 @@ Output
 	"CreditCardNumber" : "******",
 	"Card" : {
 		"Number" : "******"
+	}
+}
+```
+
+```c#
+
+- Partially masking some of the properties
+
+var example = new 
+{
+	SomeValue = "Demo",
+	Password = "SomePasswordHere",
+	DepthObject = new 
+	{
+		Password = "SomePasswordHere2",
+		Card = new 
+		{
+			Number = "555500022223333"
+		}
+	},
+	CreditCardNumber = "5555000011112222",
+	Card = new 
+	{
+		Number = "555500022223333"
+	}
+};
+
+var blacklistPartial = new Dictionary<string, Func<string, string>>(StringComparer.OrdinalIgnoreCase) // The key is the property to be partially masked and the value is the function to be applied.
+{
+    { "*card.number", text =>  // Note that the property "*card.number" is also in the blacklist. If the property only exists in the blacklistPartial, it will not be masked.
+        Regex.Replace(
+            text,
+            @"(\d{4,5})[ -|]?(\d{3,6})[ -|]?(\d{3,5})[ -|]?(\d{3,4})",
+            match => $"{match.Value.Substring(0, 6)}*****{match.Value.Substring(match.Value.Length - 4, 4)}")
+    }
+};
+
+var exampleAsString = JsonConvert.Serialize(example); // The value must be a JSON string to be masked.
+
+// Note that the password is only replaced when it is in the root path.
+var blacklist = new string[] { "password", "*card.number", "creditcardnumber" };
+var mask = "******";
+
+var maskedExampleAsString = exampleAsString.MaskFields(blacklist, mask, blacklistPartial); // The blacklistPartial is optional. If provided, it will apply the mask only if the property is also in the blacklist.
+
+Console.WriteLine(maskedExampleAsString);
+
+```
+
+Output
+```json
+{
+	"SomeValue" : "Demo",
+	"Password" : "******",
+	"DepthObject" : {
+		"Password" : "SomePasswordHere2",
+		"Card" : {
+			"Number" : "555500*****3333"
+		}
+	},
+	"CreditCardNumber" : "******",
+	"Card" : {
+		"Number" : "555500*****3333"
 	}
 }
 ```
