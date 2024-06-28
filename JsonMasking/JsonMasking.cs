@@ -37,7 +37,19 @@ namespace JsonMasking
                 return json;
             }
 
-            var jsonObject = (JObject)JsonConvert.DeserializeObject(json);
+            var deserilizedObject = JsonConvert.DeserializeObject(json);
+
+            if (deserilizedObject is JArray)
+            {
+                foreach (var item in (JArray)deserilizedObject)
+                {
+                    MaskFieldsFromJToken(item, blacklist, mask);
+                }
+
+                return deserilizedObject.ToString();
+            }
+          
+            var jsonObject = (JObject) deserilizedObject;
 
             if (blacklistPartial != null)
             {
