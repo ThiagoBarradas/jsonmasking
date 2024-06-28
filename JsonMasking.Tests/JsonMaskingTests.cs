@@ -201,7 +201,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null.\nParameter name: blacklist", ex.Message.Replace("\r\n", "\n"));
+            Assert.Equal("Value cannot be null. (Parameter 'blacklist')", ex.Message);
         }
 
         [Fact]
@@ -217,7 +217,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null.\nParameter name: json", ex.Message.Replace("\r\n", "\n"));
+            Assert.Equal("Value cannot be null. (Parameter 'json')", ex.Message);
         }
 
         [Fact]
@@ -233,7 +233,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null.\nParameter name: json", ex.Message.Replace("\r\n", "\n"));
+            Assert.Equal("Value cannot be null. (Parameter 'json')", ex.Message);
         }
 
         [Fact]
