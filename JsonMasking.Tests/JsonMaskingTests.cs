@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using JsonMasking;
 using System;
 using Xunit;
+using System.Collections.Generic;
 
 namespace JsonMasking.Tests
 {
@@ -18,14 +19,14 @@ namespace JsonMasking.Tests
                 Password = "somepass#here"
             };
             var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
-            string[] blacklist = {};
+            string[] blacklist = { };
             var mask = "*******";
 
             // act
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"Test\": \"1\",\n  \"Password\": \"somepass#here\"\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"Test\": \"1\",\n  \"Password\": \"somepass#here\"\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -45,7 +46,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"Test\": \"1\",\n  \"OtherField\": \"somepass#here\"\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"Test\": \"1\",\n  \"OtherField\": \"somepass#here\"\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -65,7 +66,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"Test\": \"1\",\n  \"Password\": \"----\"\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"Test\": \"1\",\n  \"Password\": \"----\"\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -85,7 +86,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"Test\": 1,\n  \"Password\": \"*******\"\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"Test\": 1,\n  \"Password\": \"*******\"\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -108,7 +109,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -132,7 +133,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"Password\": \"*******\",\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"Password\": \"*******\",\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -156,7 +157,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"Password\": \"*******\",\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"CreditCardNumber\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"Password\": \"*******\",\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"CreditCardNumber\": \"*******\"\n  }\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -179,7 +180,7 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"*******\"\n  }\n}", result.Replace("\r\n", "\n"));
         }
 
         [Fact]
@@ -296,7 +297,51 @@ namespace JsonMasking.Tests
             var result = json.MaskFields(blacklist, mask);
 
             // assert
-            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\"\n    }\n  },\n  \"DepthObject2\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\",\n      \"DepthObject\": {\n        \"Test\": \"1\",\n        \"Password\": \"*******\"\n      }\n    }\n  },\n  \"Password\": \"somepass#here\"\n}", result.Replace("\r\n","\n"));
+            Assert.Equal("{\n  \"DepthObject\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\"\n    }\n  },\n  \"DepthObject2\": {\n    \"Test\": \"1\",\n    \"Password\": \"somepass#here\",\n    \"DepthObject\": {\n      \"Test\": \"1\",\n      \"Password\": \"*******\",\n      \"DepthObject\": {\n        \"Test\": \"1\",\n        \"Password\": \"*******\"\n      }\n    }\n  },\n  \"Password\": \"somepass#here\"\n}", result.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_With_Wildcard_ForJsonArray()
+        {
+            // arrange
+            var dto1 =
+            new
+            {
+                Name = "Test1",
+                WillbeMasked = "12345"
+            };
+
+            var dto2 =
+                    new
+                    {
+                        Name = "Test2",
+                        WillbeMasked = "123"
+                    };
+
+            List<object> list = new List<object>();
+
+            list.Add(dto1);
+            list.Add(dto2);
+
+            var json = JsonConvert.SerializeObject(list, Formatting.Indented);
+            
+            string[] blacklist = { "*.WillbeMasked" };
+            var mask = "*******";
+
+            // act
+            var result = json.MaskFields(blacklist, mask);
+
+            // assert
+            Assert.Equal(@"[
+  {
+    ""Name"": ""Test1"",
+    ""WillbeMasked"": ""*******""
+  },
+  {
+    ""Name"": ""Test2"",
+    ""WillbeMasked"": ""*******""
+  }
+]", result);
         }
     }
 }
