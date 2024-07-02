@@ -202,7 +202,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null. (Parameter 'blacklist')", ex.Message.Replace("\r\n", "\n"));
+            Assert.Equal("Value cannot be null. (Parameter 'blacklist')", ex.Message);
         }
 
         [Fact]
@@ -218,7 +218,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null. (Parameter 'json')", ex.Message.Replace("\r\n", "\n"));
+            Assert.Equal("Value cannot be null. (Parameter 'json')", ex.Message);
         }
 
         [Fact]
@@ -234,7 +234,7 @@ namespace JsonMasking.Tests
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.Equal("Value cannot be null. (Parameter 'json')", ex.Message.Replace("\r\n", "\n"));
+            Assert.Equal("Value cannot be null. (Parameter 'json')", ex.Message);
         }
 
         [Fact]
@@ -526,6 +526,49 @@ namespace JsonMasking.Tests
 
             // assert
             Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
+        }
+      
+        public static void MaskFields_Should_Mask_With_Wildcard_ForJsonArray()
+        {
+            // arrange
+            var dto1 =
+            new
+            {
+                Name = "Test1",
+                WillbeMasked = "12345"
+            };
+
+            var dto2 =
+                    new
+                    {
+                        Name = "Test2",
+                        WillbeMasked = "123"
+                    };
+
+            List<object> list = new List<object>();
+
+            list.Add(dto1);
+            list.Add(dto2);
+
+            var json = JsonConvert.SerializeObject(list, Formatting.Indented);
+            
+            string[] blacklist = { "*.WillbeMasked" };
+            var mask = "*******";
+
+            // act
+            var result = json.MaskFields(blacklist, mask);
+
+            // assert
+            Assert.Equal(@"[
+  {
+    ""Name"": ""Test1"",
+    ""WillbeMasked"": ""*******""
+  },
+  {
+    ""Name"": ""Test2"",
+    ""WillbeMasked"": ""*******""
+  }
+]", result);
         }
 
         [Fact]
