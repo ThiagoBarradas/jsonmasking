@@ -1,5 +1,6 @@
 using JsonMasking.Tests.Mocks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -468,7 +469,36 @@ namespace JsonMasking.Tests
         }
 
         [Fact]
-        public static void MaskFields_Should_Mask_Completely_If_Deledate_return_Same_Value()
+        public static void MaskFields_Should_Mask_Completely_If_Partial_Blacklist_Is_Empty()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"----\",\n    \"Password\": \"somepass#here2\"\n  }\n}";
+
+            var blacklistPartialMock = new Dictionary<string, Func<string, string>>(StringComparer.OrdinalIgnoreCase){ };
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2"
+                }
+            };
+
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_Completely_If_Delegate_Return_Same_Value()
         {
             // arrange
             const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"----\",\n    \"Password\": \"somepass#here2\"\n  }\n}";
@@ -496,6 +526,73 @@ namespace JsonMasking.Tests
 
             // assert
             Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Throw_Exception_Correctly_When_Has_error_In_Delegate()
+        {
+            // arrange
+            const string EXPECTED_ERROR = "An error occurred while executing the function in the dictionary value. startIndex cannot be larger than length of string. (Parameter 'startIndex')";
+
+            var blacklistPartialMock = new Dictionary<string, Func<string, string>>(StringComparer.OrdinalIgnoreCase) 
+            {
+                { "*card.number", text => text.Substring(100) }
+            };
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2"
+                }
+            };
+
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number" };
+            var mask = "----";
+
+            // act
+            Exception ex = Assert.Throws<InvalidOperationException>(() =>
+                json.MaskFields(blacklist, mask, blacklistPartialMock));
+
+            // assert
+            Assert.Equal(EXPECTED_ERROR, ex.Message);
+        }
+
+        [Theory]
+        [InlineData("4622943127049865", "462294*****9865")]
+        [InlineData(" 462   29431270   49865 ", "462294*****9865")]
+        [InlineData("46@22912704986@5", "----")]
+        [InlineData("462.29431.2704.9865", "----")]
+        [InlineData("46|2294312|70498|65", "----")]
+        [InlineData("123", "----")]
+        [InlineData("0123456789123456789012345", "012345*****2345")]
+        public static void MaskFields_Should_Mask_Completely_and_Partially_Correctly(string received, string expected)
+        {
+            // arrange
+            var blacklistPartialMock = BlacklistPartialMock.DefaultBlackListPartial;
+
+            var obj = new
+            {
+                Card = new
+                {
+                    Number = received,
+                }
+            };
+
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+            var jsonObject = JObject.Parse(result);
+            var numberMasked = jsonObject["Card"]["Number"].ToString();
+
+            // assert
+            Assert.Equal(numberMasked, expected);
         }
     }
 }
