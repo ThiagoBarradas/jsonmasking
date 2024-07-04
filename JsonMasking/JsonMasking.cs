@@ -149,8 +149,16 @@ namespace JsonMasking
                 if (blacklistPartial.TryGetValue(blacklistPartial.GetKey(prop.Path), out var maskFunc))
                 {
                     var value = prop.Value.ToString();
-                    var valueMasked = maskFunc(value);
-                    prop.Value = (valueMasked != value) ? valueMasked : mask;
+                    try
+                    {
+                        var valueMasked = maskFunc(value);
+                        prop.Value = (valueMasked != value) ? valueMasked : mask;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException(
+                            $"An error occurred while executing the function in the dictionary value. {ex.Message}");
+                    }
                 }
                 else
                 {
