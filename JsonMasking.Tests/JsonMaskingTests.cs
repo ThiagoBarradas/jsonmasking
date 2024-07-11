@@ -527,7 +527,8 @@ namespace JsonMasking.Tests
             // assert
             Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
         }
-      
+
+        [Fact]
         public static void MaskFields_Should_Mask_With_Wildcard_ForJsonArray()
         {
             // arrange
@@ -636,6 +637,37 @@ namespace JsonMasking.Tests
 
             // assert
             Assert.Equal(numberMasked, expected);
+        }
+
+        [Fact]
+        public static void MaskFields_Should_Mask_Completely_If_Delegate_Is_Null()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"----\",\n    \"Password\": \"somepass#here2\"\n  }\n}";
+
+            var blacklistPartialMock = new Dictionary<string, Func<string, string>>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "*card.number", null }
+            };
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2"
+                }
+            };
+            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            string[] blacklist = { "*card.number" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
         }
     }
 }

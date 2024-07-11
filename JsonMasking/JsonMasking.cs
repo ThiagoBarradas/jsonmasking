@@ -151,7 +151,7 @@ namespace JsonMasking
                     var value = prop.Value.ToString();
                     try
                     {
-                        var valueMasked = maskFunc(value);
+                        var valueMasked = (maskFunc != null) ? maskFunc(value) : mask;
                         prop.Value = (valueMasked != value) ? valueMasked : mask;
                     }
                     catch (Exception ex)
