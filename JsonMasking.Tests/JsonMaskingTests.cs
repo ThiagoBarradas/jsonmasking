@@ -1,14 +1,18 @@
 using JsonMasking.Tests.Mocks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Xunit;
 
 namespace JsonMasking.Tests
 {
     public static class JsonMaskingTests
     {
+        private static readonly JsonSerializerOptions IndentedOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
 
         [Fact]
         public static void MaskFields_Should_Mask_No_Field_With_Empty_Blacklist()
@@ -19,7 +23,7 @@ namespace JsonMasking.Tests
                 Test = "1",
                 Password = "somepass#here"
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { };
             var mask = "*******";
 
@@ -39,7 +43,7 @@ namespace JsonMasking.Tests
                 Test = "1",
                 OtherField = "somepass#here"
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "password" };
             var mask = "*******";
 
@@ -59,7 +63,7 @@ namespace JsonMasking.Tests
                 Test = "1",
                 Password = "somepass#here"
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "password" };
             var mask = "----";
 
@@ -79,7 +83,7 @@ namespace JsonMasking.Tests
                 Test = 1,
                 Password = 123456
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*password" };
             var mask = "*******";
 
@@ -102,7 +106,7 @@ namespace JsonMasking.Tests
                     Password = "somepass#here"
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*.password" };
             var mask = "*******";
 
@@ -126,7 +130,7 @@ namespace JsonMasking.Tests
                     Password = "somepass#here2"
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*password" };
             var mask = "*******";
 
@@ -150,7 +154,7 @@ namespace JsonMasking.Tests
                     CreditCardNumber = "5555000011112222"
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "password", "*creditcardnumber" };
             var mask = "*******";
 
@@ -173,7 +177,7 @@ namespace JsonMasking.Tests
                     Password = (string)null,
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*password" };
             var mask = "*******";
 
@@ -193,7 +197,7 @@ namespace JsonMasking.Tests
                 Test = "1",
                 Password = "somepass#here"
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = null;
             var mask = "*******";
 
@@ -246,11 +250,11 @@ namespace JsonMasking.Tests
             string mask = "------";
 
             // act
-            Exception ex = Assert.Throws<JsonReaderException>(() =>
+            Exception ex = Assert.Throws<JsonException>(() =>
                 json.MaskFields(blacklist, mask));
 
             // assert
-            Assert.StartsWith("Unexpected character encountered while parsing value", ex.Message);
+            Assert.Contains("is an invalid start of a value", ex.Message);
         }
 
         [Fact]
@@ -290,7 +294,7 @@ namespace JsonMasking.Tests
                 },
                 Password = "somepass#here"
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*.DepthObject*.Password" };
             var mask = "*******";
 
@@ -319,7 +323,7 @@ namespace JsonMasking.Tests
                 }
             };
 
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number" };
             var mask = "----";
 
@@ -348,7 +352,7 @@ namespace JsonMasking.Tests
                 },
                 Password = "somepass#here2"
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number", "*password" };
             var mask = "----";
 
@@ -388,7 +392,7 @@ namespace JsonMasking.Tests
 
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number" };
             var mask = "----";
 
@@ -429,7 +433,7 @@ namespace JsonMasking.Tests
                     }
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number", "*password" };
             var mask = "----";
 
@@ -457,7 +461,7 @@ namespace JsonMasking.Tests
                     Password = "somepass#here2"
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { };
             var mask = "----";
 
@@ -486,7 +490,7 @@ namespace JsonMasking.Tests
                 }
             };
 
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number" };
             var mask = "----";
 
@@ -517,7 +521,7 @@ namespace JsonMasking.Tests
                     Password = "somepass#here2"
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number" };
             var mask = "----";
 
@@ -551,8 +555,8 @@ namespace JsonMasking.Tests
             list.Add(dto1);
             list.Add(dto2);
 
-            var json = JsonConvert.SerializeObject(list, Formatting.Indented);
-            
+            var json = JsonSerializer.Serialize(list, IndentedOptions);
+
             string[] blacklist = { "*.WillbeMasked" };
             var mask = "*******";
 
@@ -593,7 +597,7 @@ namespace JsonMasking.Tests
                 }
             };
 
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number" };
             var mask = "----";
 
@@ -626,13 +630,13 @@ namespace JsonMasking.Tests
                 }
             };
 
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number" };
             var mask = "----";
 
             // act
             var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
-            var jsonObject = JObject.Parse(result);
+            var jsonObject = JsonNode.Parse(result);
             var numberMasked = jsonObject["Card"]["Number"].ToString();
 
             // assert
@@ -659,7 +663,7 @@ namespace JsonMasking.Tests
                     Password = "somepass#here2"
                 }
             };
-            var json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+            var json = JsonSerializer.Serialize(obj, IndentedOptions);
             string[] blacklist = { "*card.number" };
             var mask = "----";
 
