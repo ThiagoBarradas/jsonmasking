@@ -37,16 +37,7 @@ namespace JsonMasking
                 return json;
             }
 
-            JsonNode deserializedObject;
-            try
-            {
-                deserializedObject = JsonNode.Parse(json);
-            }
-            catch (JsonException ex) when (ex.GetType().Name == "JsonReaderException")
-            {
-                // Re-throw as JsonException to maintain compatibility with the test expectations
-                throw new JsonException(ex.Message, ex);
-            }
+            JsonNode deserializedObject = JsonNode.Parse(json);
 
             if (deserializedObject is JsonArray jsonArray)
             {
@@ -166,7 +157,7 @@ namespace JsonMasking
                         catch (Exception ex)
                         {
                             throw new InvalidOperationException(
-                                $"An error occurred while executing the function in the dictionary value. {ex.Message}");
+                                $"An error occurred while executing the function in the dictionary value. {ex.Message}", ex);
                         }
                     }
                     else

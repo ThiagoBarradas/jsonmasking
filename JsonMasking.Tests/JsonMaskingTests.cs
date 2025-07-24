@@ -250,7 +250,7 @@ namespace JsonMasking.Tests
             string mask = "------";
 
             // act
-            Exception ex = Assert.Throws<JsonException>(() =>
+            Exception ex = Assert.ThrowsAny<JsonException>(() =>
                 json.MaskFields(blacklist, mask));
 
             // assert
