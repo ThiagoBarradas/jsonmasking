@@ -8,13 +8,14 @@
     <PackageLicenseUrl>https://github.com/ThiagoBarradas/jsonmasking/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ThiagoBarradas/jsonmasking</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ThiagoBarradas/jsonmasking</RepositoryUrl>
-    <PackageTags>newtonsoft json masking utility remove mask core standard easy replace wildcard regex</PackageTags>
+    <PackageTags>system text json masking utility remove mask core standard easy replace wildcard
+      regex</PackageTags>
     <PackageIconUrl>https://i.imgur.com/ZhUJnNd.png</PackageIconUrl>
     <Description>Replace fields in json, replacing by something, don't care if property is in depth objects. Very useful to replace passwords credit card number, etc.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Text.Json" Version="6.0.11" />
   </ItemGroup>
 
 </Project>

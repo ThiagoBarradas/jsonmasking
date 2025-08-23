@@ -1,11 +1,20 @@
-version: 2
+version: 2.1
+
+orbs:
+  node: circleci/node@5.0.1
+
 jobs:
   build:
-    working_directory: /app
-    docker:
-      - image: mcr.microsoft.com/dotnet/sdk:6.0
+    executor:
+      name: node/default
     steps:
       - checkout
+      - run:
+          command: wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && sudo dpkg -i packages-microsoft-prod.deb
+          name: Pre-Install tasks
+      - run:
+          command: sudo apt-get update && sudo apt-get install -y apt-transport-https && sudo apt-get update && sudo apt-get install -y dotnet-sdk-6.0
+          name: Install dotnet-skd-6.0
       - run:
           name: Checking files
           command: ls -al
@@ -16,33 +25,45 @@ jobs:
           name: Publishing app
           command: dotnet publish -c Release -o binn
       - store_artifacts:
-          path: /app/JsonMasking/binn
+          path: ~/JsonMasking/binn
           destination: app-artifact
       - persist_to_workspace:
-          root: /
+          root: /app
           paths:
-            - app
+            - ~/
  
   unit_tests:
-    working_directory: /
-    docker:
-      - image: mcr.microsoft.com/dotnet/sdk:6.0
+    executor:
+      name: node/default
     steps:
+      - checkout
+      - run:
+          command: wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && sudo dpkg -i packages-microsoft-prod.deb
+          name: Pre-Install tasks
+      - run:
+          command: sudo apt-get update && sudo apt-get install -y apt-transport-https && sudo apt-get update && sudo apt-get install -y dotnet-sdk-6.0
+          name: Install dotnet-skd-6.0
+      - run:
+          name: Checking files
+          command: ls -al
       - attach_workspace:
           at: /
       - run:
-          name: Checking files
-          command: ls /app      
+          name: Checking files root
+          command: ls ~/
+      - run:
+          name: Checking files app
+          command: ls ~/app      
       - run:
           name: Install coverlet
           command: |
             dotnet tool install --global coverlet.console 
-            cd /app/JsonMasking.Tests
+            cd ~/app/JsonMasking.Tests
             dotnet add package coverlet.msbuild
       - run:
           name: Running unit tests
           command: |
-            dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=/test-result/result /p:Exclude=[xunit.*]* /app/JsonMasking.sln
+            dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=/test-result/result /p:Exclude=[xunit.*]* ~/app/JsonMasking.sln
       - store_artifacts:
           path: /test-result
           destination: test-result
