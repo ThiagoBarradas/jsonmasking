@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
 namespace JsonMasking
@@ -37,132 +37,141 @@ namespace JsonMasking
                 return json;
             }
 
-            var deserilizedObject = JsonConvert.DeserializeObject(json);
+            JsonNode deserializedObject = JsonNode.Parse(json);
 
-            if (deserilizedObject is JArray)
+            if (deserializedObject is JsonArray jsonArray)
             {
-                foreach (var item in (JArray)deserilizedObject)
+                for (int i = 0; i < jsonArray.Count; i++)
                 {
-                    MaskFieldsFromJToken(item, blacklist, mask);
+                    MaskFieldsFromJsonNode(jsonArray[i], blacklist, mask, i.ToString());
                 }
 
-                return deserilizedObject.ToString();
+                return deserializedObject.ToString();
             }
-          
-            var jsonObject = (JObject) deserilizedObject;
+
+            var jsonObject = deserializedObject.AsObject();
 
             if (blacklistPartial != null)
             {
-                MaskFieldsFromJToken(jsonObject, blacklist, mask, blacklistPartial);
+                MaskFieldsFromJsonNode(jsonObject, blacklist, mask, blacklistPartial, "");
             }
             else
             {
-                MaskFieldsFromJToken(jsonObject, blacklist, mask);
+                MaskFieldsFromJsonNode(jsonObject, blacklist, mask, "");
             }
 
             return jsonObject.ToString();
         }
 
         /// <summary>
-        /// Mask fields from JToken
+        /// Mask fields from JsonNode
         /// </summary>
-        /// <param name="token"></param>
+        /// <param name="node"></param>
         /// <param name="blacklist"></param>
         /// <param name="mask"></param>
-        /// <param name="namespaceItems"></param>
-        private static void MaskFieldsFromJToken(JToken token, string[] blacklist, string mask)
+        /// <param name="currentPath"></param>
+        private static void MaskFieldsFromJsonNode(JsonNode node, string[] blacklist, string mask, string currentPath = "")
         {
-            JContainer container = token as JContainer;
-            if (container == null)
+            if (node == null)
             {
                 return; // abort recursive
             }
 
-            List<JToken> removeList = new List<JToken>();
-            foreach (JToken jtoken in container.Children())
+            if (node is JsonObject jsonObject)
             {
-                if (jtoken is JProperty prop)
+                var propertiesToMask = new List<string>();
+
+                foreach (var property in jsonObject)
                 {
-                    var matching = blacklist.Any(item =>
-                    {
-                        return IsMatch(prop.Path, item);
-                    });
+                    var path = string.IsNullOrEmpty(currentPath) ? property.Key : $"{currentPath}.{property.Key}";
+                    var matching = blacklist.Any(item => IsMatch(path, item));
 
                     if (matching)
                     {
-                        removeList.Add(jtoken);
+                        propertiesToMask.Add(property.Key);
                     }
+
+                    // call recursive 
+                    MaskFieldsFromJsonNode(property.Value, blacklist, mask, path);
                 }
 
-                // call recursive 
-                MaskFieldsFromJToken(jtoken, blacklist, mask);
+                // replace 
+                foreach (var propertyName in propertiesToMask)
+                {
+                    jsonObject[propertyName] = JsonValue.Create(mask);
+                }
             }
-
-            // replace 
-            foreach (JToken el in removeList)
+            else if (node is JsonArray jsonArray)
             {
-                var prop = (JProperty)el;
-                prop.Value = mask;
+                for (int i = 0; i < jsonArray.Count; i++)
+                {
+                    var path = string.IsNullOrEmpty(currentPath) ? i.ToString() : $"{currentPath}.{i}";
+                    MaskFieldsFromJsonNode(jsonArray[i], blacklist, mask, path);
+                }
             }
         }
 
         /// <summary>
-        /// Mask fields completely or partially from JToken
+        /// Mask fields completely or partially from JsonNode
         /// </summary>
-        /// <param name="token"></param>
+        /// <param name="node"></param>
         /// <param name="blacklist"></param>
         /// <param name="mask"></param>
         /// <param name="blacklistPartial"></param>
-        /// <param name="namespaceItems"></param>
-        private static void MaskFieldsFromJToken(JToken token, string[] blacklist, string mask, Dictionary<string, Func<string, string>> blacklistPartial)
+        /// <param name="currentPath"></param>
+        private static void MaskFieldsFromJsonNode(JsonNode node, string[] blacklist, string mask, Dictionary<string, Func<string, string>> blacklistPartial, string currentPath = "")
         {
-            JContainer container = token as JContainer;
-            if (container == null)
+            if (node == null)
             {
                 return; // abort recursive
             }
 
-            List<JToken> removeList = new List<JToken>();
-            foreach (JToken jtoken in container.Children())
+            if (node is JsonObject jsonObject)
             {
-                if (jtoken is JProperty prop)
+                var propertiesToMask = new List<(string key, string path)>();
+
+                foreach (var property in jsonObject)
                 {
-                    var matching = blacklist.Any(item =>
-                    {
-                        return IsMatch(prop.Path, item);
-                    });
+                    var path = string.IsNullOrEmpty(currentPath) ? property.Key : $"{currentPath}.{property.Key}";
+                    var matching = blacklist.Any(item => IsMatch(path, item));
 
                     if (matching)
                     {
-                        removeList.Add(jtoken);
+                        propertiesToMask.Add((property.Key, path));
                     }
+
+                    // call recursive 
+                    MaskFieldsFromJsonNode(property.Value, blacklist, mask, blacklistPartial, path);
                 }
 
-                // call recursive 
-                MaskFieldsFromJToken(jtoken, blacklist, mask, blacklistPartial);
+                foreach (var (key, path) in propertiesToMask)
+                {
+                    if (blacklistPartial.TryGetValue(blacklistPartial.GetKey(path), out var maskFunc))
+                    {
+                        var value = jsonObject[key]?.ToString() ?? "";
+                        try
+                        {
+                            var valueMasked = (maskFunc != null) ? maskFunc(value) : mask;
+                            jsonObject[key] = JsonValue.Create((valueMasked != value) ? valueMasked : mask);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new InvalidOperationException(
+                                $"An error occurred while executing the function in the dictionary value. {ex.Message}", ex);
+                        }
+                    }
+                    else
+                    {
+                        jsonObject[key] = JsonValue.Create(mask);
+                    }
+                }
             }
-
-            foreach (JToken el in removeList)
+            else if (node is JsonArray jsonArray)
             {
-                var prop = (JProperty)el;
-
-                if (blacklistPartial.TryGetValue(blacklistPartial.GetKey(prop.Path), out var maskFunc))
+                for (int i = 0; i < jsonArray.Count; i++)
                 {
-                    var value = prop.Value.ToString();
-                    try
-                    {
-                        var valueMasked = (maskFunc != null) ? maskFunc(value) : mask;
-                        prop.Value = (valueMasked != value) ? valueMasked : mask;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidOperationException(
-                            $"An error occurred while executing the function in the dictionary value. {ex.Message}");
-                    }
-                }
-                else
-                {
-                    prop.Value = mask;
+                    var path = string.IsNullOrEmpty(currentPath) ? i.ToString() : $"{currentPath}.{i}";
+                    MaskFieldsFromJsonNode(jsonArray[i], blacklist, mask, blacklistPartial, path);
                 }
             }
         }
