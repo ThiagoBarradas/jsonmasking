@@ -124,6 +124,10 @@ stages:
       clean: all
     condition: and(succeeded(), eq(variables['execute_test'], 'true'))
     steps:
+    - task: UseDotNet@2
+       inputs:
+         packageType: 'sdk'
+         version: '6.0.x'
     - script: | 
         dotnet tool install --global coverlet.console 
         dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
