@@ -43,22 +43,15 @@ namespace JsonMasking
             {
                 for (int i = 0; i < jsonArray.Count; i++)
                 {
-                    MaskFieldsFromJsonNode(jsonArray[i], blacklist, mask, i.ToString());
+                    JsonNode jsonNode = jsonArray[i];
+                    MaskFieldsFromJsonNode(jsonNode, blacklist, mask, blacklistPartial, i.ToString());
                 }
 
                 return deserializedObject.ToString();
             }
 
             var jsonObject = deserializedObject.AsObject();
-
-            if (blacklistPartial != null)
-            {
-                MaskFieldsFromJsonNode(jsonObject, blacklist, mask, blacklistPartial, "");
-            }
-            else
-            {
-                MaskFieldsFromJsonNode(jsonObject, blacklist, mask, "");
-            }
+            MaskFieldsFromJsonNode(jsonObject, blacklist, mask, blacklistPartial, "");
 
             return jsonObject.ToString();
         }
@@ -124,6 +117,11 @@ namespace JsonMasking
             if (node == null)
             {
                 return; // abort recursive
+            }
+
+            if (blacklistPartial == null)
+            {
+                blacklistPartial = new Dictionary<string, Func<string, string>>();
             }
 
             if (node is JsonObject jsonObject)
