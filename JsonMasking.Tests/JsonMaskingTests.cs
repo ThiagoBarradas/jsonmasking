@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace JsonMasking.Tests
@@ -333,6 +334,39 @@ namespace JsonMasking.Tests
             // assert
             Assert.Equal(EXPECTED_VALUE, result.Replace("\r\n", "\n"));
         }
+
+
+        [Fact]
+        public static void MaskFields_Should_Mask_With_Array()
+        {
+            // arrange
+            const string EXPECTED_VALUE = "[{\n  \"Test\": \"1\",\n  \"Card\": {\n    \"Number\": \"462294*****9865\",\n    \"Password\": \"somepass#here2\"\n  }\n}]";
+
+            var blacklistPartialMock = BlacklistPartialMock.DefaultBlackListPartial;
+
+            var obj = new
+            {
+                Test = "1",
+                Card = new
+                {
+                    Number = "4622943127049865",
+                    Password = "somepass#here2"
+                }
+            };
+
+            var arr = new object[1] { obj };
+
+            var json = JsonSerializer.Serialize(arr, IndentedOptions);
+            string[] blacklist = { "*card.number" };
+            var mask = "----";
+
+            // act
+            var result = json.MaskFields(blacklist, mask, blacklistPartialMock);
+
+            // assert
+            Assert.True(JToken.DeepEquals(JToken.Parse(EXPECTED_VALUE), JToken.Parse(result)));
+        }
+
 
         [Fact]
         public static void MaskFields_Should_Mask_Partial_And_Completely_With_Single_Field()
